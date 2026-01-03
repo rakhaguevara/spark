@@ -199,7 +199,7 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="menu-disabled" data-tooltip="My Ticket">
+                        <a href="<?= BASEURL ?>/pages/my-ticket.php" data-tooltip="My Ticket">
                             <i class="fas fa-ticket-alt"></i>
                             <span>My Ticket</span>
                         </a>

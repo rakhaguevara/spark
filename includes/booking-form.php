@@ -8,7 +8,7 @@ $time = $bookingData['time_start'] ?? '';
 $duration = $bookingData['duration'] ?? 0;
 ?>
 
-<form id="bookingForm" action="<?= BASEURL ?>/actions/create-booking.php" method="POST" class="booking-form">
+<form id="bookingForm" action="<?= BASEURL ?>/actions/process-booking.php" method="POST" class="booking-form">
     <!-- Hidden Fields -->
     <input type="hidden" name="id_tempat" value="<?= htmlspecialchars($parking_id) ?>">
     <input type="hidden" name="harga_per_jam" value="<?= htmlspecialchars($price) ?>">
