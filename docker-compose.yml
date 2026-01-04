@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Web Server (PHP + Apache)
+  web:
+    build: .
+    container_name: spark-app
+    ports:
+      - "8080:80"
+    environment:
+      - BASEURL=http://localhost:8080
+      - DB_HOST=db
+      - DB_NAME=spark
+      - DB_USER=root
+      - DB_PASS=rootpassword
+    depends_on:
+      - db
+    volumes:
+      - ./:/var/www/html # Sync local files for development
+
+  # Database (MariaDB)
+  db:
+    image: mariadb:10.4
+    container_name: spark-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=spark
+    volumes:
+      - db_data:/var/lib/mysql
+      # Auto-import spark (1).sql on first run
+      - ./spark (1).sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+
+  # phpMyAdmin (Database Management)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: spark-pma
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=root
+      - PMA_PASSWORD=rootpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+
+volumes:
+  db_data:

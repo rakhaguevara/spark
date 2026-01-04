@@ -1,10 +1,11 @@
 <?php
 // config/database.php
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'spark');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// Docker-friendly configuration with fallback to local defaults
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_NAME', getenv('DB_NAME') ?: 'spark');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
 
 function getDBConnection(): PDO {
     static $pdo = null;
