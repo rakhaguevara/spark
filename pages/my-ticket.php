@@ -54,10 +54,10 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user['id_pengguna']]);
 $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get active booking (first confirmed)
+// Get active booking (first confirmed or ongoing)
 $activeBooking = null;
 foreach ($bookings as $booking) {
-    if ($booking['status_booking'] === 'confirmed') {
+    if (in_array($booking['status_booking'], ['confirmed', 'ongoing'])) {
         $activeBooking = $booking;
         break;
     }
@@ -202,9 +202,35 @@ foreach ($bookings as $booking) {
                                 <span class="value">#<?= htmlspecialchars($activeBooking['id_booking']) ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Status</span>
-                                <span class="status-badge <?= $activeBooking['status_booking'] ?>">
-                                    <?= ucfirst($activeBooking['status_booking']) ?>
+                                <!-- Status Logic & Display -->
+                                <?php
+                                $statusLabel = '';
+                                $statusClass = '';
+                                
+                                switch ($activeBooking['status_booking']) {
+                                    case 'confirmed':
+                                        $statusLabel = 'Not Scanned';
+                                        $statusClass = 'status-pending'; // Yellow
+                                        break;
+                                    case 'ongoing': // Assuming we add this state
+                                        $statusLabel = 'On Going';
+                                        $statusClass = 'status-ongoing'; // Blue/Green
+                                        break;
+                                    case 'completed':
+                                        $statusLabel = 'Finished';
+                                        $statusClass = 'status-success'; // Green
+                                        break;
+                                    case 'cancelled':
+                                        $statusLabel = 'Cancelled';
+                                        $statusClass = 'status-cancelled'; // Red
+                                        break;
+                                    default:
+                                        $statusLabel = ucfirst($activeBooking['status_booking']);
+                                        $statusClass = 'status-' . $activeBooking['status_booking'];
+                                }
+                                ?>
+                                <span class="status-badge <?= $statusClass ?>">
+                                    <?= $statusLabel ?>
                                 </span>
                             </div>
                             <div class="detail-row">
@@ -226,7 +252,7 @@ foreach ($bookings as $booking) {
                                     if (!empty($activeBooking['waktu_mulai']) && strtotime($activeBooking['waktu_mulai']) > 0) {
                                         echo date('d M Y, H:i', strtotime($activeBooking['waktu_mulai']));
                                     } else {
-                                        echo 'Invalid date';
+                                        echo '<span class="text-muted">--:--</span>';
                                     }
                                     ?>
                                 </span>
@@ -238,22 +264,140 @@ foreach ($bookings as $booking) {
                                     if (!empty($activeBooking['waktu_selesai']) && strtotime($activeBooking['waktu_selesai']) > 0) {
                                         echo date('d M Y, H:i', strtotime($activeBooking['waktu_selesai']));
                                     } else {
-                                        echo 'Invalid date';
+                                        echo '<span class="text-muted">--:--</span>';
                                     }
                                     ?>
                                 </span>
                             </div>
+
+                            <!-- Cancel Button Section -->
+                            <?php if (in_array($activeBooking['status_booking'], ['confirmed', 'pending'])): ?>
+                            <div class="ticket-actions" style="margin-top: 24px; text-align: right; border-top: 1px solid #f3f4f6; padding-top: 16px;">
+                                <button type="button" class="btn-cancel-ticket" onclick="showCancelModal(<?= $activeBooking['id_booking'] ?>)">
+                                    Cancel Ticket
+                                </button>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
             <?php else: ?>
                 <div class="empty-state">
-                    <i class="fas fa-ticket-alt"></i>
+                    <div style="font-size: 64px; color: #fbbf24; margin-bottom: 24px;">
+                        <i class="fas fa-search-location"></i>
+                    </div>
                     <h3>No Active Tickets</h3>
-                    <p>You don't have any active parking tickets</p>
+                    <p>You don't have any active parking tickets at the moment.</p>
                     <a href="<?= BASEURL ?>/pages/dashboard.php" class="btn-primary">Find Parking</a>
                 </div>
             <?php endif; ?>
+            
+            <!-- Cancel Confirmation Modal -->
+            <div id="cancelModal" class="modal-overlay" style="display: none;">
+                <div class="modal-content" style="max-width: 400px; text-align: center;">
+                    <div style="margin-bottom: 16px;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #ef4444;"></i>
+                    </div>
+                    <h3 style="margin-bottom: 8px;">Cancel Ticket?</h3>
+                    <p style="color: #666; margin-bottom: 24px;">Are you sure you want to cancel this ticket? This action cannot be undone.</p>
+                    <div class="modal-actions" style="display: flex; gap: 12px; justify-content: center;">
+                        <button onclick="closeCancelModal()" style="padding: 10px 20px; border: 1px solid #d1d5db; background: white; border-radius: 6px; cursor: pointer;">No, Keep Packet</button>
+                        <button id="confirmCancelBtn" style="padding: 10px 20px; border: none; background: #ef4444; color: white; border-radius: 6px; cursor: pointer;">Yes, Cancel Ticket</button>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .btn-cancel-ticket {
+                    background: transparent;
+                    border: 1px solid #ef4444;
+                    color: #ef4444;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .btn-cancel-ticket:hover {
+                    background: #fef2f2;
+                }
+                .modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .modal-content {
+                    background: white;
+                    padding: 24px;
+                    border-radius: 12px;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                    animation: slideUp 0.3s ease;
+                }
+                @keyframes slideUp {
+                    from { transform: translateY(20px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                /* Status Colors */
+                .status-badge.status-pending { background: #fffbeb; color: #b45309; border: 1px solid #fcd34d; } /* Not Scanned */
+                .status-badge.status-ongoing { background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; } /* On Going */
+                .status-badge.status-success { background: #ecfdf5; color: #047857; border: 1px solid #6ee7b7; } /* Finished */
+                .status-badge.status-cancelled { background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; } /* Cancelled */
+            </style>
+
+            <script>
+                let currentBookingId = null;
+
+                function showCancelModal(bookingId) {
+                    currentBookingId = bookingId;
+                    document.getElementById('cancelModal').style.display = 'flex';
+                }
+
+                function closeCancelModal() {
+                    document.getElementById('cancelModal').style.display = 'none';
+                    currentBookingId = null;
+                }
+
+                document.getElementById('confirmCancelBtn').addEventListener('click', function() {
+                    if (!currentBookingId) return;
+
+                    const btn = this;
+                    btn.disabled = true;
+                    btn.textContent = 'Cancelling...';
+
+                    fetch('<?= BASEURL ?>/actions/cancel-ticket.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'booking_id=' + currentBookingId
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Ticket cancelled successfully');
+                            location.reload();
+                        } else {
+                            alert(data.message || 'Failed to cancel ticket');
+                            btn.disabled = false;
+                            btn.textContent = 'Yes, Cancel Ticket';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred');
+                        btn.disabled = false;
+                        btn.textContent = 'Yes, Cancel Ticket';
+                    });
+                });
+            </script>
+
 
             <!-- TICKET HISTORY -->
             <?php if (count($bookings) > 0): ?>
@@ -326,10 +470,8 @@ foreach ($bookings as $booking) {
                         qrImage.src = BASEURL + '/api/generate-qr-image.php?booking_id=' + BOOKING_ID + '&t=' + Date.now();
                     }
                     
-                    // Reset countdown
+                // Reset countdown
                     countdown = 10;
-                } else {
-                    console.error('QR refresh failed:', data.error);
                 }
             })
             .catch(error => {
@@ -337,6 +479,22 @@ foreach ($bookings as $booking) {
             });
         }
         
+        // Poll for Status Changes (Real-time update)
+        let currentStatus = '<?= $activeBooking['status_booking'] ?? '' ?>';
+        function checkBookingStatus() {
+            if (!BOOKING_ID) return;
+
+            fetch(BASEURL + '/actions/check-status.php?booking_id=' + BOOKING_ID)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.status && data.status !== currentStatus) {
+                        console.log('Status changed to ' + data.status + ', reloading...');
+                        location.reload();
+                    }
+                })
+                .catch(err => console.error('Status check prevented'));
+        }
+
         // Start auto-refresh if booking exists
         if (BOOKING_ID) {
             // Update countdown every second
@@ -345,7 +503,10 @@ foreach ($bookings as $booking) {
             // Refresh QR every 10 seconds
             refreshTimer = setInterval(refreshQRCode, REFRESH_INTERVAL);
             
-            console.log('QR auto-refresh started for booking:', BOOKING_ID);
+            // Check status every 3 seconds
+            setInterval(checkBookingStatus, 3000);
+
+            console.log('QR/Status auto-refresh started for booking:', BOOKING_ID);
         }
         
         // Cleanup on page unload
