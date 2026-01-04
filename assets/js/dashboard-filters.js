@@ -1,224 +1,140 @@
 /**
- * DASHBOARD-FILTERS.JS
- * Handles filter functionality for parking cards and map markers
+ * DASHBOARD FILTERS CONTROLLER
+ * Handles vehicle type filtering and UI state
  */
 
-(function () {
-    'use strict';
+document.addEventListener('DOMContentLoaded', function () {
+    // Elements
+    const filterPills = document.querySelectorAll('.filter-pill');
 
-    // Filter state
-    let activeFilters = {
-        vehicleType: null, // null = all, or specific type like 'Motor', 'Mobil'
-        facilityType: null // 'self-park', 'garage', or null
-    };
+    // Get current filter params
+    const urlParams = new URLSearchParams(window.location.search);
+    const vehicleType = urlParams.get('vehicle_type');
+    const facilityType = urlParams.get('facility');
 
-    document.addEventListener('DOMContentLoaded', function () {
-        initializeFilters();
+    // Initialize Active States
+    if (vehicleType) {
+        // If vehicle type is set (Motor/Mobil), highlight the Vehicle Type button
+        const btn = document.querySelector('.filter-pill[data-filter="vehicle"]');
+        if (btn) {
+            btn.classList.add('active');
+            // Update text to show selected type
+            btn.innerHTML = `<i class="fas fa-car"></i> ${vehicleType}`;
+        }
+    } else if (facilityType) {
+        // If facility is set
+        const btn = document.querySelector(`.filter-pill[data-filter="${facilityType}"]`);
+        if (btn) btn.classList.add('active');
+    } else {
+        // Default to All
+        const btnAll = document.querySelector('.filter-pill[data-filter="all"]');
+        if (btnAll) btnAll.classList.add('active');
+    }
+
+    // Add click listeners
+    filterPills.forEach(pill => {
+        pill.addEventListener('click', function (e) {
+            e.stopPropagation(); // Prevent bubbling
+            const filterKey = this.getAttribute('data-filter');
+
+            if (filterKey === 'all') {
+                resetFilters();
+            } else if (filterKey === 'vehicle') {
+                showVehicleDropdown(this);
+            } else {
+                toggleFilter(filterKey);
+            }
+        });
     });
 
-    function initializeFilters() {
-        // Set active state based on URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const vehicleType = urlParams.get('vehicle_type');
+    // Close dropdown on outside click
+    document.addEventListener('click', function () {
+        const dropdown = document.querySelector('.vehicle-dropdown-menu');
+        if (dropdown) dropdown.remove();
+    });
 
-        if (vehicleType) {
-            const filterVehicleType = document.getElementById('filterVehicleType');
-            if (filterVehicleType) {
-                updateFilterButtonState(filterVehicleType, true);
-            }
-        } else {
-            const filterAll = document.getElementById('filterAll');
-            if (filterAll) {
-                updateFilterButtonState(filterAll, true);
-            }
-        }
-
-        // Filter All button - clear all filters
-        const filterAll = document.getElementById('filterAll');
-        if (filterAll) {
-            filterAll.addEventListener('click', () => {
-                // Remove all query parameters and reload
-                window.location.href = window.location.pathname;
-            });
-        }
-
-        // Vehicle Type filter
-        const filterVehicleType = document.getElementById('filterVehicleType');
-        if (filterVehicleType) {
-            filterVehicleType.addEventListener('click', () => {
-                showVehicleTypeMenu(filterVehicleType);
-            });
-        }
-
-        // Facility filters
-        const filterSelfPark = document.getElementById('filterSelfPark');
-        if (filterSelfPark) {
-            filterSelfPark.addEventListener('click', () => {
-                toggleFacilityFilter('self-park', filterSelfPark);
-            });
-        }
-
-        const filterGarage = document.getElementById('filterGarage');
-        if (filterGarage) {
-            filterGarage.addEventListener('click', () => {
-                toggleFacilityFilter('garage', filterGarage);
-            });
-        }
-    }
-
-    function showVehicleTypeMenu(button) {
-        // Create dropdown menu
-        const existingMenu = document.querySelector('.vehicle-type-menu');
-        if (existingMenu) {
-            existingMenu.remove();
-            return;
-        }
+    /**
+     * Show vehicle type selection dropdown
+     */
+    function showVehicleDropdown(button) {
+        // Remove existing
+        const existing = document.querySelector('.vehicle-dropdown-menu');
+        if (existing) existing.remove();
 
         const menu = document.createElement('div');
-        menu.className = 'vehicle-type-menu';
+        menu.className = 'vehicle-dropdown-menu';
         menu.innerHTML = `
-            <div class="filter-menu-item" data-type="">All Vehicles</div>
-            <div class="filter-menu-item" data-type="Motor">Motor</div>
-            <div class="filter-menu-item" data-type="Mobil">Mobil</div>
+            <div class="menu-item" onclick="applyVehicleFilter('Mobil')"><i class="fas fa-car"></i> Mobil</div>
+            <div class="menu-item" onclick="applyVehicleFilter('Motor')"><i class="fas fa-motorcycle"></i> Motor</div>
         `;
 
-        // Append to body for proper positioning
-        document.body.appendChild(menu);
+        // Style
+        menu.style.position = 'absolute';
+        menu.style.top = (button.offsetTop + button.offsetHeight + 8) + 'px';
+        menu.style.left = button.offsetLeft + 'px';
+        menu.style.background = 'white';
+        menu.style.border = '1px solid #e5e7eb';
+        menu.style.borderRadius = '8px';
+        menu.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+        menu.style.padding = '8px 0';
+        menu.style.zIndex = '1000';
+        menu.style.minWidth = '140px';
 
-        // Position menu below button
-        const rect = button.getBoundingClientRect();
-        menu.style.position = 'fixed';
-        menu.style.top = (rect.bottom + 5) + 'px';
-        menu.style.left = rect.left + 'px';
-        menu.style.zIndex = '10000';
+        // Add to parent
+        button.parentNode.appendChild(menu);
 
-        // Add click handlers - reload page with query param
-        menu.querySelectorAll('.filter-menu-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                const type = e.target.dataset.type;
+        // Styling for items
+        const items = menu.querySelectorAll('.menu-item');
+        items.forEach(item => {
+            item.style.padding = '8px 16px';
+            item.style.cursor = 'pointer';
+            item.style.fontSize = '14px';
+            item.style.display = 'flex';
+            item.style.alignItems = 'center';
+            item.style.gap = '8px';
+            item.style.color = '#333';
+            item.style.transition = 'background 0.2s';
 
-                // Build URL with filter parameter
-                const url = new URL(window.location.href);
-                if (type) {
-                    url.searchParams.set('vehicle_type', type);
-                } else {
-                    url.searchParams.delete('vehicle_type');
-                }
-
-                // Reload page with filter
-                window.location.href = url.toString();
-            });
+            item.onmouseover = () => item.style.background = '#f9fafb';
+            item.onmouseout = () => item.style.background = 'white';
         });
-
-        // Close menu when clicking outside
-        setTimeout(() => {
-            document.addEventListener('click', function closeMenu(e) {
-                if (!menu.contains(e.target) && e.target !== button) {
-                    menu.remove();
-                    document.removeEventListener('click', closeMenu);
-                }
-            });
-        }, 0);
     }
 
-    function toggleFacilityFilter(type, button) {
-        if (activeFilters.facilityType === type) {
-            activeFilters.facilityType = null;
-            updateFilterButtonState(button, false);
+    /**
+     * Apply standard single-select filter (Self Park / Garage)
+     */
+    function toggleFilter(filterKey) {
+        const params = new URLSearchParams(window.location.search);
+
+        // If clicking the same facility, toggle off? Or switch?
+        // Let's assume single select for facility: either self-park OR garage.
+        if (params.get('facility') === filterKey) {
+            params.delete('facility');
         } else {
-            // Deactivate other facility filters
-            document.querySelectorAll('#filterSelfPark, #filterGarage').forEach(btn => {
-                updateFilterButtonState(btn, false);
-            });
-
-            activeFilters.facilityType = type;
-            updateFilterButtonState(button, true);
+            params.set('facility', filterKey);
+            // Remove vehicle filter if strict? No, allow combination.
         }
-
-        applyFilters();
+        params.delete('page');
+        window.location.href = `${window.location.pathname}?${params.toString()}`;
     }
 
+    /**
+     * Reset all filters
+     */
     function resetFilters() {
-        activeFilters = {
-            vehicleType: null,
-            facilityType: null
-        };
-
-        // Reset all button states
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            updateFilterButtonState(btn, false);
-        });
-
-        // Activate "All" button
-        const filterAll = document.getElementById('filterAll');
-        if (filterAll) {
-            updateFilterButtonState(filterAll, true);
-        }
+        // Keep search query? Maybe.
+        const params = new URLSearchParams(window.location.search);
+        params.delete('vehicle_type');
+        params.delete('facility');
+        params.delete('page');
+        window.location.href = `${window.location.pathname}?${params.toString()}`;
     }
+});
 
-    function updateFilterButtonState(button, isActive) {
-        if (isActive) {
-            button.classList.add('active');
-        } else {
-            button.classList.remove('active');
-        }
-    }
-
-    function applyFilters() {
-        const cards = document.querySelectorAll('.parking-card');
-
-        cards.forEach(card => {
-            const shouldShow = cardMatchesFilters(card);
-
-            if (shouldShow) {
-                card.style.display = '';
-                showMarker(card.dataset.id);
-            } else {
-                card.style.display = 'none';
-                hideMarker(card.dataset.id);
-            }
-        });
-    }
-
-    function cardMatchesFilters(card) {
-        // Vehicle Type filter
-        if (activeFilters.vehicleType) {
-            const vehicleTypesJson = card.dataset.vehicleTypes;
-            if (!vehicleTypesJson) return false;
-
-            try {
-                const vehicleTypes = JSON.parse(vehicleTypesJson);
-                if (!vehicleTypes.includes(activeFilters.vehicleType)) {
-                    return false;
-                }
-            } catch (e) {
-                console.error('Error parsing vehicle types:', e);
-                return false;
-            }
-        }
-
-        // Facility Type filter (placeholder - needs backend data)
-        if (activeFilters.facilityType) {
-            // TODO: Add facility type data attribute to cards
-            // For now, show all cards
-        }
-
-        return true;
-    }
-
-    function showMarker(id) {
-        if (window.parkingMarkers && window.parkingMarkers[id]) {
-            window.parkingMarkers[id].addTo(window.parkingMap);
-        }
-    }
-
-    function hideMarker(id) {
-        if (window.parkingMarkers && window.parkingMarkers[id]) {
-            window.parkingMap.removeLayer(window.parkingMarkers[id]);
-        }
-    }
-
-    // Expose reset function globally
-    window.resetParkingFilters = resetFilters;
-
-})();
+// Global function for dropdown onclick
+window.applyVehicleFilter = function (type) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('vehicle_type', type);
+    params.delete('page');
+    window.location.href = `${window.location.pathname}?${params.toString()}`;
+};

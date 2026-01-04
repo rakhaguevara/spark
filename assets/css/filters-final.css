@@ -1,0 +1,251 @@
+/* =========================================
+   CLEAN FILTER BAR (SIMPLE & CLASSIC)
+========================================= */
+
+/* Main Container */
+.filters-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* ================= FILTER PILLS ================= */
+.filter-pill {
+    height: 38px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    color: #666;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 100ms ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.filter-pill:hover {
+    border-color: #d1d5db;
+}
+
+.filter-pill.active {
+    background: var(--spark-yellow);
+    color: #222;
+    border-color: var(--spark-yellow);
+    font-weight: 500;
+}
+
+.filter-pill i {
+    font-size: 12px;
+}
+
+/* ================= SEARCH INPUT ================= */
+.search-input-wrapper {
+    position: relative;
+    margin-left: auto;
+}
+
+.search-input {
+    height: 38px;
+    padding: 8px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    min-width: 240px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: border-color 100ms ease;
+    font-size: 14px;
+    color: #666;
+}
+
+.search-input:hover {
+    border-color: #d1d5db;
+}
+
+.search-input.active {
+    border-color: var(--spark-yellow);
+}
+
+.search-input i:first-child {
+    color: #999;
+    font-size: 13px;
+}
+
+.search-input i:last-child {
+    color: #999;
+    font-size: 11px;
+    margin-left: auto;
+}
+
+#searchInputText {
+    flex: 1;
+    color: #222;
+    font-weight: 400;
+}
+
+/* ================= FLOATING POPUP ================= */
+.search-popup {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 320px;
+    z-index: 1000;
+    display: none;
+}
+
+.search-popup.show {
+    display: block;
+}
+
+.search-popup-content {
+    padding: 16px;
+}
+
+/* Popup Inputs */
+.popup-input-group {
+    margin-bottom: 12px;
+}
+
+.popup-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #222;
+    transition: border-color 100ms ease;
+}
+
+.popup-input:focus {
+    outline: none;
+    border-color: var(--spark-yellow);
+}
+
+/* City Chips Container */
+.city-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.city-chip {
+    padding: 6px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    background: white;
+    color: #666;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 100ms ease;
+}
+
+.city-chip:hover {
+    border-color: #d1d5db;
+    background: #f9fafb;
+}
+
+.city-chip.active {
+    background: var(--spark-yellow);
+    color: #222;
+    border-color: var(--spark-yellow);
+    font-weight: 500;
+}
+
+/* Popup Actions */
+.popup-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.btn-reset,
+.btn-apply {
+    flex: 1;
+    height: 36px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 100ms ease;
+}
+
+.btn-reset {
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #666;
+}
+
+.btn-reset:hover {
+    border-color: #d1d5db;
+    background: #f9fafb;
+}
+
+.btn-apply {
+    background: var(--spark-yellow);
+    border: none;
+    color: #222;
+}
+
+.btn-apply:hover {
+    background: #f5d800;
+}
+
+/* ================= SORT DROPDOWN ================= */
+.sort-dropdown {
+    position: relative;
+    margin-left: 10px;
+}
+
+.sort-dropdown select {
+    height: 38px;
+    padding: 8px 32px 8px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    color: #222;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    appearance: none;
+    transition: border-color 100ms ease;
+    min-width: 170px;
+}
+
+.sort-dropdown select:hover {
+    border-color: #d1d5db;
+}
+
+.sort-dropdown select:focus {
+    outline: none;
+    border-color: var(--spark-yellow);
+}
+
+.sort-dropdown::after {
+    content: '\f078';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 10px;
+    pointer-events: none;
+}

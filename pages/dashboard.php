@@ -16,8 +16,17 @@ if (!isLoggedIn()) {
 $user = getCurrentUser();
 $pdo = getDBConnection();
 
+// Helper function to get first 2 words of name
+function getShortName($fullName) {
+    $words = explode(' ', trim($fullName));
+    $shortName = implode(' ', array_slice($words, 0, 2));
+    return $shortName;
+}
+
 // Get filter parameters
 $vehicleTypeFilter = $_GET['vehicle_type'] ?? null;
+$cityFilter = $_GET['city'] ?? null;
+$dateFilter = $_GET['date'] ?? null;
 
 // Build SQL query with optional vehicle type filter
 $sql = "
@@ -41,17 +50,46 @@ $sql = "
 ";
 
 // Add vehicle type filter if specified
+$whereConditions = [];
+$params = [];
+
 if ($vehicleTypeFilter) {
-    $sql .= "
-    WHERE EXISTS (
+    $whereConditions[] = "EXISTS (
         SELECT 1 
         FROM slot_parkir sp2
         INNER JOIN jenis_kendaraan jk ON sp2.id_jenis = jk.id_jenis
         WHERE sp2.id_tempat = tp.id_tempat
         AND sp2.status_slot = 'available'
         AND jk.nama_jenis = :vehicle_type
-    )
-    ";
+    )";
+    $params['vehicle_type'] = $vehicleTypeFilter;
+}
+
+// Facility Filter (Self Park / Garage)
+// Note: Since 'is_covered' column is missing in provided schema, currently mocking logic
+// or assuming 'Garage' implies checks against 'Covered' logic if implemented later.
+// For now, we allow the parameter to pass through.
+$facilityFilter = $_GET['facility'] ?? null;
+if ($facilityFilter) {
+    if ($facilityFilter === 'garage') {
+        // Example: If we had a column. For now, we can filter by name or assume all are supported.
+        // $whereConditions[] = "tp.is_covered = 1"; 
+        // Or check if name contains Mall/Garage
+        // $whereConditions[] = "(tp.nama_tempat LIKE '%Mall%' OR tp.nama_tempat LIKE '%Garage%')"; 
+    } elseif ($facilityFilter === 'self-park') {
+        // $whereConditions[] = "tp.is_self_park = 1";
+    }
+}
+
+// Add city filter if specified
+if ($cityFilter) {
+    $whereConditions[] = "tp.alamat_tempat LIKE :city";
+    $params['city'] = "%{$cityFilter}%";
+}
+
+// Build WHERE clause
+if (!empty($whereConditions)) {
+    $sql .= " WHERE " . implode(" AND ", $whereConditions);
 }
 
 $sql .= "
@@ -59,12 +97,8 @@ $sql .= "
     ORDER BY tp.nama_tempat ASC
 ";
 
-if ($vehicleTypeFilter) {
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['vehicle_type' => $vehicleTypeFilter]);
-} else {
-    $stmt = $pdo->query($sql);
-}
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 
 $parkingSpots = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -171,9 +205,13 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
             <button class="icon-btn" title="Notifications"><i class="fas fa-bell"></i></button>
             <div class="profile-chip">
                 <div class="profile-avatar">
-                    <?= strtoupper(substr($user['nama_pengguna'] ?? 'U', 0, 1)) ?>
+                    <?php if (!empty($user['profile_image'])): ?>
+                        <img src="<?= BASEURL ?>/uploads/<?= htmlspecialchars($user['profile_image']) ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    <?php else: ?>
+                        <?= strtoupper(substr($user['nama_pengguna'] ?? 'U', 0, 1)) ?>
+                    <?php endif; ?>
                 </div>
-                <span><?= htmlspecialchars($user['nama_pengguna'] ?? 'User') ?></span>
+                <span><?= htmlspecialchars(getShortName($user['nama_pengguna'] ?? 'User')) ?></span>
             </div>
         </div>
     </nav>
@@ -204,13 +242,13 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="menu-disabled" data-tooltip="History">
+                        <a href="<?= BASEURL ?>/pages/history.php" data-tooltip="History">
                             <i class="fas fa-history"></i>
                             <span>History</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="menu-disabled" data-tooltip="Wallet">
+                        <a href="<?= BASEURL ?>/pages/wallet.php" data-tooltip="Wallet">
                             <i class="fas fa-wallet"></i>
                             <span>Wallet</span>
                         </a>
@@ -220,7 +258,7 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
 
             <!-- Bottom Section (Settings + Logout) -->
             <div class="sidebar-bottom">
-                <a href="#" class="menu-disabled" data-tooltip="Settings">
+                <a href="<?= BASEURL ?>/pages/profile.php" data-tooltip="Settings">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </a>
@@ -236,21 +274,79 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
 
             <!-- FILTERS BAR -->
             <div class="filters-bar">
-                <button class="filter-btn" id="filterAll">
+                <!-- Filter Pills -->
+                <button class="filter-pill active" data-filter="all">
                     <i class="fas fa-filter"></i>
                     All
                 </button>
-                <button class="filter-btn" id="filterVehicleType">
+                <button class="filter-pill" data-filter="vehicle">
                     <i class="fas fa-car"></i>
                     Vehicle Type
                 </button>
-                <button class="filter-btn" id="filterSelfPark">
+                <button class="filter-pill" data-filter="self-park">
                     Self Park
                 </button>
-                <button class="filter-btn" id="filterGarage">
+                <button class="filter-pill" data-filter="garage">
                     Garage - Covered
                 </button>
                 
+                <!-- Combined Search Input (Simple) -->
+                <div class="search-input-wrapper">
+                    <button class="search-input" id="searchInputBtn" type="button">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="searchInputText">
+                            <?php 
+                            if ($cityFilter || $dateFilter) {
+                                $cityText = $cityFilter ?: 'City';
+                                $dateText = $dateFilter ? date('d M Y', strtotime($dateFilter)) : 'Date';
+                                echo htmlspecialchars($cityText) . ' • ' . htmlspecialchars($dateText);
+                            } else {
+                                echo 'Select city and date';
+                            }
+                            ?>
+                        </span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    <!-- Hidden inputs for backend -->
+                    <input type="hidden" id="selectedCity" value="<?= htmlspecialchars($cityFilter ?? '') ?>">
+                    <input type="hidden" id="selectedDate" value="<?= htmlspecialchars($dateFilter ?? '') ?>">
+                    
+                    <!-- Floating Popup (Hidden by default) -->
+                    <div class="search-popup" id="searchPopup">
+                        <div class="search-popup-content">
+                            <!-- City Search -->
+                            <div class="popup-input-group">
+                                <input type="text" class="popup-input" id="citySearch" placeholder="Search city...">
+                            </div>
+                            
+                            <!-- City Chips (Hidden until needed) -->
+                            <div class="city-chips-container" id="cityChipsContainer">
+                                <button class="city-chip" data-city="Jakarta">Jakarta</button>
+                                <button class="city-chip" data-city="Bandung">Bandung</button>
+                                <button class="city-chip" data-city="Surabaya">Surabaya</button>
+                                <button class="city-chip" data-city="Yogyakarta">Yogyakarta</button>
+                                <button class="city-chip" data-city="Semarang">Semarang</button>
+                                <button class="city-chip" data-city="Malang">Malang</button>
+                                <button class="city-chip" data-city="Solo">Solo</button>
+                                <button class="city-chip" data-city="Cirebon">Cirebon</button>
+                            </div>
+                            
+                            <!-- Date Picker -->
+                            <div class="popup-input-group">
+                                <input type="date" class="popup-input" id="popupDateInput" min="<?= date('Y-m-d') ?>" value="<?= htmlspecialchars($dateFilter ?? '') ?>">
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="popup-actions">
+                                <button class="btn-reset" id="btnReset">Reset</button>
+                                <button class="btn-apply" id="btnApply">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sort Dropdown -->
                 <div class="sort-dropdown">
                     <select id="sortSelect">
                         <option value="relevance">Sort by Relevance</option>
@@ -308,5 +404,6 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
     <script src="<?= BASEURL ?>/assets/js/dashboard-card-interaction.js"></script>
     <script src="<?= BASEURL ?>/assets/js/dashboard-search-sort.js"></script>
     <script src="<?= BASEURL ?>/assets/js/dashboard-filters.js"></script>
+    <script src="<?= BASEURL ?>/assets/js/search-popup.js"></script>
 </body>
 </html>

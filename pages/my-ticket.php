@@ -20,6 +20,13 @@ if (!isLoggedIn()) {
 // Get user
 $user = getCurrentUser();
 
+// Helper function to get first 2 words of name
+function getShortName($fullName) {
+    $words = explode(' ', trim($fullName));
+    $shortName = implode(' ', array_slice($words, 0, 2));
+    return $shortName;
+}
+
 // Fetch active bookings with QR tokens
 $pdo = getDBConnection();
 $stmt = $pdo->prepare("
@@ -87,9 +94,13 @@ foreach ($bookings as $booking) {
             <button class="icon-btn" title="Notifications"><i class="fas fa-bell"></i></button>
             <div class="profile-chip">
                 <div class="profile-avatar">
-                    <?= strtoupper(substr($user['nama_pengguna'] ?? 'U', 0, 1)) ?>
+                    <?php if (!empty($user['profile_image'])): ?>
+                        <img src="<?= BASEURL ?>/uploads/<?= htmlspecialchars($user['profile_image']) ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    <?php else: ?>
+                        <?= strtoupper(substr($user['nama_pengguna'] ?? 'U', 0, 1)) ?>
+                    <?php endif; ?>
                 </div>
-                <span><?= htmlspecialchars($user['nama_pengguna'] ?? 'User') ?></span>
+                <span><?= htmlspecialchars(getShortName($user['nama_pengguna'] ?? 'User')) ?></span>
             </div>
         </div>
     </nav>
@@ -117,13 +128,13 @@ foreach ($bookings as $booking) {
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="menu-disabled" data-tooltip="History">
+                        <a href="<?= BASEURL ?>/pages/history.php" data-tooltip="History">
                             <i class="fas fa-history"></i>
                             <span>History</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="menu-disabled" data-tooltip="Wallet">
+                        <a href="<?= BASEURL ?>/pages/wallet.php" data-tooltip="Wallet">
                             <i class="fas fa-wallet"></i>
                             <span>Wallet</span>
                         </a>
@@ -132,7 +143,7 @@ foreach ($bookings as $booking) {
             </nav>
 
             <div class="sidebar-bottom">
-                <a href="#" class="menu-disabled" data-tooltip="Settings">
+                <a href="<?= BASEURL ?>/pages/profile.php" data-tooltip="Settings">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </a>
