@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Database Setup Script
  * Run this script after cloning the project to ensure database schema is complete
@@ -32,7 +33,8 @@ if (!$isCLI) {
     <pre>';
 }
 
-function logMessage($message, $type = 'info') {
+function logMessage($message, $type = 'info')
+{
     global $isCLI;
     $colors = [
         'success' => $isCLI ? "\033[32m" : '<span class="success">',
@@ -41,17 +43,17 @@ function logMessage($message, $type = 'info') {
         'warning' => $isCLI ? "\033[33m" : '<span class="warning">',
     ];
     $reset = $isCLI ? "\033[0m" : '</span>';
-    
+
     echo $colors[$type] . $message . $reset . "\n";
     if (!$isCLI) flush();
 }
 
 try {
     logMessage("=== Starting Database Setup ===", 'info');
-    
+
     $pdo = getDBConnection();
     logMessage("✓ Database connection successful", 'success');
-    
+
     // Check and add foto_tempat column to tempat_parkir if missing
     logMessage("\n[1] Checking tempat_parkir table...", 'info');
     $stmt = $pdo->query("SHOW COLUMNS FROM tempat_parkir LIKE 'foto_tempat'");
@@ -62,7 +64,7 @@ try {
     } else {
         logMessage("  ✓ foto_tempat column exists", 'success');
     }
-    
+
     // Check and add is_plat_required column if missing
     $stmt = $pdo->query("SHOW COLUMNS FROM tempat_parkir LIKE 'is_plat_required'");
     if ($stmt->rowCount() === 0) {
@@ -72,7 +74,7 @@ try {
     } else {
         logMessage("  ✓ is_plat_required column exists", 'success');
     }
-    
+
     // Check kendaraan_pengguna table for plat_hash and plat_hint
     logMessage("\n[2] Checking kendaraan_pengguna table...", 'info');
     $stmt = $pdo->query("SHOW COLUMNS FROM kendaraan_pengguna LIKE 'plat_hash'");
@@ -83,7 +85,7 @@ try {
     } else {
         logMessage("  ✓ plat_hash column exists", 'success');
     }
-    
+
     $stmt = $pdo->query("SHOW COLUMNS FROM kendaraan_pengguna LIKE 'plat_hint'");
     if ($stmt->rowCount() === 0) {
         logMessage("  → Adding plat_hint column...", 'warning');
@@ -92,7 +94,7 @@ try {
     } else {
         logMessage("  ✓ plat_hint column exists", 'success');
     }
-    
+
     // Check booking_parkir for qr_secret
     logMessage("\n[3] Checking booking_parkir table...", 'info');
     $stmt = $pdo->query("SHOW COLUMNS FROM booking_parkir LIKE 'qr_secret'");
@@ -103,7 +105,7 @@ try {
     } else {
         logMessage("  ✓ qr_secret column exists", 'success');
     }
-    
+
     // Check if qr_session table exists
     logMessage("\n[4] Checking qr_session table...", 'info');
     $stmt = $pdo->query("SHOW TABLES LIKE 'qr_session'");
@@ -115,7 +117,7 @@ try {
     } else {
         logMessage("  ✓ qr_session table exists", 'success');
     }
-    
+
     // Check if tickets table exists
     logMessage("\n[5] Checking tickets table...", 'info');
     $stmt = $pdo->query("SHOW TABLES LIKE 'tickets'");
@@ -127,7 +129,7 @@ try {
     } else {
         logMessage("  ✓ tickets table exists", 'success');
     }
-    
+
     // Check data_pengguna for profile_image
     logMessage("\n[6] Checking data_pengguna table...", 'info');
     $stmt = $pdo->query("SHOW COLUMNS FROM data_pengguna LIKE 'profile_image'");
@@ -138,7 +140,7 @@ try {
     } else {
         logMessage("  ✓ profile_image column exists", 'success');
     }
-    
+
     // Check user_preferences table
     logMessage("\n[7] Checking user_preferences table...", 'info');
     $stmt = $pdo->query("SHOW TABLES LIKE 'user_preferences'");
@@ -150,7 +152,7 @@ try {
     } else {
         logMessage("  ✓ user_preferences table exists", 'success');
     }
-    
+
     // Check wallet_payment_methods table
     logMessage("\n[8] Checking wallet_payment_methods table...", 'info');
     $stmt = $pdo->query("SHOW TABLES LIKE 'wallet_payment_methods'");
@@ -162,10 +164,9 @@ try {
     } else {
         logMessage("  ✓ wallet_payment_methods table exists", 'success');
     }
-    
+
     logMessage("\n=== Database Setup Complete ===", 'success');
     logMessage("All tables and columns are ready!", 'success');
-    
 } catch (PDOException $e) {
     logMessage("\n=== Setup Failed ===", 'error');
     logMessage("Error: " . $e->getMessage(), 'error');

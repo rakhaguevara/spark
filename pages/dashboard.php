@@ -17,7 +17,8 @@ $user = getCurrentUser();
 $pdo = getDBConnection();
 
 // Helper function to get first 2 words of name
-function getShortName($fullName) {
+function getShortName($fullName)
+{
     $words = explode(' ', trim($fullName));
     $shortName = implode(' ', array_slice($words, 0, 2));
     return $shortName;
@@ -114,7 +115,8 @@ $stmt->execute($params);
 $parkingSpots = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Helper function to get vehicle availability per parking spot
-function getVehicleAvailability($pdo, $id_tempat, $vehicleFilter = null) {
+function getVehicleAvailability($pdo, $id_tempat, $vehicleFilter = null)
+{
     $sql = "
         SELECT 
             jk.nama_jenis,
@@ -124,18 +126,18 @@ function getVehicleAvailability($pdo, $id_tempat, $vehicleFilter = null) {
         WHERE sp.id_tempat = :id_tempat 
         AND sp.status_slot = 'available'
     ";
-    
+
     // Apply vehicle filter if specified
     if ($vehicleFilter) {
         $sql .= " AND jk.nama_jenis = :vehicle_type";
     }
-    
+
     $sql .= "
         GROUP BY jk.id_jenis, jk.nama_jenis
         HAVING available_count > 0
         ORDER BY jk.nama_jenis ASC
     ";
-    
+
     $stmt = $pdo->prepare($sql);
     $params = ['id_tempat' => $id_tempat];
     if ($vehicleFilter) {
@@ -148,7 +150,7 @@ function getVehicleAvailability($pdo, $id_tempat, $vehicleFilter = null) {
 // Add vehicle availability to each parking spot
 foreach ($parkingSpots as &$spot) {
     $spot['vehicle_availability'] = getVehicleAvailability($pdo, $spot['id_tempat'], $vehicleTypeFilter);
-    
+
     // CRITICAL: Recalculate slot_tersedia from sum of per-vehicle availability
     // This ensures total ALWAYS equals sum of per-vehicle slots (filtered)
     $totalAvailable = 0;
@@ -160,30 +162,33 @@ foreach ($parkingSpots as &$spot) {
 unset($spot);
 
 // Fungsi helper untuk format harga
-function formatPrice($price) {
+function formatPrice($price)
+{
     return 'Rp ' . number_format($price, 0, ',', '.');
 }
 
 // Fungsi untuk mendapatkan fasilitas
-function getParkingFacilities($jam_buka, $jam_tutup) {
+function getParkingFacilities($jam_buka, $jam_tutup)
+{
     $facilities = [];
-    
+
     // Cek 24 jam
     if ($jam_buka == '00:00:00' && $jam_tutup == '23:59:59') {
         $facilities[] = ['icon' => 'clock', 'text' => '24 Hours'];
     }
-    
+
     // Fasilitas standar
     $facilities[] = ['icon' => 'camera', 'text' => 'CCTV'];
     $facilities[] = ['icon' => 'shield-alt', 'text' => 'Secure'];
     $facilities[] = ['icon' => 'parking', 'text' => 'Covered'];
-    
+
     return $facilities;
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Find Parking | SPARK</title>
@@ -222,7 +227,7 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
         <div class="user-actions">
             <!-- Mobile: Profile Icon Only. Desktop: Chip -->
             <button class="icon-btn mobile-hidden" title="Notifications"><i class="fas fa-bell"></i></button>
-            
+
             <div class="profile-chip">
                 <div class="profile-avatar">
                     <?php if (!empty($user['profile_image'])): ?>
@@ -309,13 +314,13 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
                 <button class="filter-pill" data-filter="garage">
                     Garage - Covered
                 </button>
-                
+
                 <!-- Combined Search Input (Simple) -->
                 <div class="search-input-wrapper">
                     <button class="search-input" id="searchInputBtn" type="button">
                         <i class="fas fa-map-marker-alt"></i>
                         <span id="searchInputText">
-                            <?php 
+                            <?php
                             if ($cityFilter || $dateFilter) {
                                 $cityText = $cityFilter ?: 'City';
                                 $dateText = $dateFilter ? date('d M Y', strtotime($dateFilter)) : 'Date';
@@ -327,11 +332,11 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
                         </span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
-                    
+
                     <!-- Hidden inputs for backend -->
                     <input type="hidden" id="selectedCity" value="<?= htmlspecialchars($cityFilter ?? '') ?>">
                     <input type="hidden" id="selectedDate" value="<?= htmlspecialchars($dateFilter ?? '') ?>">
-                    
+
                     <!-- Floating Popup (Hidden by default) -->
                     <div class="search-popup" id="searchPopup">
                         <div class="search-popup-content">
@@ -339,7 +344,7 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
                             <div class="popup-input-group">
                                 <input type="text" class="popup-input" id="citySearch" placeholder="Search city...">
                             </div>
-                            
+
                             <!-- City Chips (Hidden until needed) -->
                             <div class="city-chips-container" id="cityChipsContainer">
                                 <button class="city-chip" data-city="Jakarta">Jakarta</button>
@@ -351,12 +356,12 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
                                 <button class="city-chip" data-city="Solo">Solo</button>
                                 <button class="city-chip" data-city="Cirebon">Cirebon</button>
                             </div>
-                            
+
                             <!-- Date Picker -->
                             <div class="popup-input-group">
                                 <input type="date" class="popup-input" id="popupDateInput" min="<?= date('Y-m-d') ?>" value="<?= htmlspecialchars($dateFilter ?? '') ?>">
                             </div>
-                            
+
                             <!-- Actions -->
                             <div class="popup-actions">
                                 <button class="btn-reset" id="btnReset">Reset</button>
@@ -365,7 +370,7 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Sort Dropdown -->
                 <div class="sort-dropdown">
                     <select id="sortSelect">
@@ -427,4 +432,5 @@ function getParkingFacilities($jam_buka, $jam_tutup) {
     <script src="<?= BASEURL ?>/assets/js/search-popup.js"></script>
     <script src="<?= BASEURL ?>/assets/js/mobile-interaction.js"></script>
 </body>
+
 </html>
