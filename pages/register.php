@@ -47,7 +47,7 @@ error_reporting(E_ALL);
             <form action="<?= BASEURL ?>/functions/register-proses.php" method="POST">
 
                 <label>Username</label>
-                <input type="text" name="username" placeholder="Enter your username" required>
+                <input type="text" name="nama" placeholder="Enter your username" required>
 
                 <label>Email Address</label>
                 <input type="email" name="email" placeholder="Enter your email address" required>
@@ -59,7 +59,7 @@ error_reporting(E_ALL);
                 <input type="password" name="confirm_password" placeholder="Confirm your password" required>
 
                 <label>Phone Number</label>
-                <input type="tel" name="phone" placeholder="Enter your phone number" required>
+                <input type="tel" name="no_hp" placeholder="Enter your phone number" required>
 
                 <button type="submit" class="btn-primary">Sign Up</button>
 

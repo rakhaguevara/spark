@@ -93,11 +93,13 @@ function formatRupiah($amount) {
         
         <div class="admin-content">
             <!-- Header -->
-            <div style="margin-bottom: 32px;">
-                <h2 style="margin: 0; font-size: 24px; font-weight: 600;">Statistik & Analitik</h2>
-                <p style="color: var(--spark-text-light); margin-top: 8px;">
-                    Analisis penggunaan dan performa lahan parkir
-                </p>
+            <div class="admin-section-header">
+                <div>
+                    <h2 class="admin-section-title">Statistik & Analitik</h2>
+                    <p class="admin-info-text" style="margin-top: 8px;">
+                        Analisis penggunaan dan performa lahan parkir
+                    </p>
+                </div>
             </div>
             
             <!-- Usage Statistics by Parking -->
@@ -119,8 +121,11 @@ function formatRupiah($amount) {
                     <tbody>
                         <?php if (empty($parking_stats)): ?>
                             <tr>
-                                <td colspan="6" style="text-align: center; color: var(--spark-text-light); padding: 40px;">
-                                    Belum ada data
+                                <td colspan="6">
+                                    <div class="admin-empty-state">
+                                        <i class="fas fa-chart-line"></i>
+                                        <p>Belum ada data statistik</p>
+                                    </div>
                                 </td>
                             </tr>
                         <?php else: ?>

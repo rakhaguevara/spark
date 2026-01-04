@@ -117,16 +117,16 @@ foreach ($role_counts as $rc) {
             <?php endif; ?>
             
             <!-- Header -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div class="admin-section-header">
                 <div>
-                    <h2 style="margin: 0; font-size: 24px; font-weight: 600;">Data Akun Pengguna</h2>
-                    <p style="color: var(--spark-text-light); margin-top: 8px;">
+                    <h2 class="admin-section-title">Data Akun Pengguna</h2>
+                    <p class="admin-info-text" style="margin-top: 8px;">
                         Kelola data akun pengguna dan penyedia lahan parkir
                     </p>
                 </div>
                 
                 <!-- Filter -->
-                <div style="display: flex; gap: 12px;">
+                <div class="admin-section-actions">
                     <a href="?role=all" 
                        class="admin-btn admin-btn-sm <?= $filter_role === 'all' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
                         Semua
@@ -161,9 +161,11 @@ foreach ($role_counts as $rc) {
                     <tbody>
                         <?php if (empty($users)): ?>
                             <tr>
-                                <td colspan="9" style="text-align: center; color: var(--spark-text-light); padding: 40px;">
-                                    <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
-                                    <p>Belum ada pengguna terdaftar</p>
+                                <td colspan="9">
+                                    <div class="admin-empty-state">
+                                        <i class="fas fa-users"></i>
+                                        <p>Belum ada pengguna terdaftar</p>
+                                    </div>
                                 </td>
                             </tr>
                         <?php else: ?>
@@ -207,14 +209,16 @@ foreach ($role_counts as $rc) {
                                     </td>
                                     <td>
                                         <?php if ($user['role_pengguna'] != 2): ?>
-                                            <form method="POST" style="display: inline;" 
-                                                  onsubmit="return confirm('Yakin ingin menghapus akun ini?');">
-                                                <input type="hidden" name="action" value="delete">
-                                                <input type="hidden" name="id_pengguna" value="<?= $user['id_pengguna'] ?>">
-                                                <button type="submit" class="admin-btn admin-btn-sm admin-btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            <div class="admin-actions-group">
+                                                <form method="POST" style="display: inline;" 
+                                                      onsubmit="return confirm('Yakin ingin menghapus akun ini?');">
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <input type="hidden" name="id_pengguna" value="<?= $user['id_pengguna'] ?>">
+                                                    <button type="submit" class="admin-btn admin-btn-sm admin-btn-danger" title="Hapus">
+                                                        <i class="fas fa-trash"></i> Hapus
+                                                    </button>
+                                                </form>
+                                            </div>
                                         <?php else: ?>
                                             <span style="color: var(--spark-text-light);">-</span>
                                         <?php endif; ?>

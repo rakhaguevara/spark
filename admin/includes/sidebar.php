@@ -1,12 +1,13 @@
 <aside class="admin-sidebar">
     <div class="admin-sidebar-header">
         <div class="admin-sidebar-logo">
-            <img src="<?= BASEURL ?>/assets/img/logo.png" alt="SPARK Logo">
+            <img src="<?= BASEURL ?>/assets/img/logo.png" alt="SPARK Logo" width="48" height="48">
             <h2>SPARK Admin</h2>
         </div>
     </div>
     
-    <ul class="admin-menu">
+    <nav>
+        <ul class="admin-menu">
         <li class="admin-menu-item">
             <a href="<?= BASEURL ?>/admin/dashboard.php" class="admin-menu-link <?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">
                 <i class="fas fa-th-large admin-menu-icon"></i>
@@ -44,5 +45,6 @@
             </a>
         </li>
     </ul>
+    </nav>
 </aside>
 

@@ -90,7 +90,7 @@ function getStatusBadge($status) {
             <?php endif; ?>
             
             <!-- Statistics -->
-            <div class="admin-stats" style="margin-bottom: 32px;">
+            <div class="admin-stats">
                 <div class="admin-stat-card">
                     <div class="admin-stat-header">
                         <h3 class="admin-stat-title">Total Transaksi</h3>
@@ -133,9 +133,9 @@ function getStatusBadge($status) {
             </div>
             
             <!-- Filters -->
-            <div class="admin-table-container" style="margin-bottom: 24px;">
-                <div style="padding: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                    <span style="color: var(--spark-text-light);">Filter:</span>
+            <div class="admin-table-container" style="margin-bottom: 28px;">
+                <div style="padding: 20px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <span style="color: var(--spark-text-light); font-weight: 500;">Filter:</span>
                     <a href="?status=all" 
                        class="admin-btn admin-btn-sm <?= $filter_status === 'all' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
                         Semua
@@ -159,7 +159,7 @@ function getStatusBadge($status) {
                     <form method="GET" style="display: flex; gap: 8px; margin-left: auto;">
                         <input type="hidden" name="status" value="<?= $filter_status ?>">
                         <input type="date" name="date" value="<?= $filter_date ?>" 
-                               class="admin-form-input" style="width: auto;">
+                               class="admin-form-input" style="width: auto; padding: 8px 12px;">
                         <button type="submit" class="admin-btn admin-btn-sm admin-btn-primary">
                             <i class="fas fa-search"></i>
                         </button>
@@ -191,9 +191,11 @@ function getStatusBadge($status) {
                     <tbody>
                         <?php if (empty($transactions)): ?>
                             <tr>
-                                <td colspan="9" style="text-align: center; color: var(--spark-text-light); padding: 40px;">
-                                    <i class="fas fa-receipt" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
-                                    <p>Belum ada transaksi</p>
+                                <td colspan="9">
+                                    <div class="admin-empty-state">
+                                        <i class="fas fa-receipt"></i>
+                                        <p>Belum ada transaksi</p>
+                                    </div>
                                 </td>
                             </tr>
                         <?php else: ?>

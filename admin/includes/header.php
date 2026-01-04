@@ -26,6 +26,15 @@ $admin = getCurrentAdmin();
     
     <!-- Admin CSS -->
     <link rel="stylesheet" href="<?= BASEURL ?>/assets/css/admin.css">
+    
+    <style>
+        /* Force dark background for admin pages */
+        html, body {
+            background: #1a1a1a !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    </style>
 </head>
-<body>
+<body style="margin: 0; padding: 0; background: #1a1a1a;">
 

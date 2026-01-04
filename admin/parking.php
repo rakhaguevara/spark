@@ -80,11 +80,13 @@ function formatTime($time) {
             <?php endif; ?>
             
             <!-- Header Actions -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h2 style="margin: 0; font-size: 24px; font-weight: 600;">Daftar Lahan Parkir</h2>
-                <a href="<?= BASEURL ?>/admin/parking-detail.php?action=add" class="admin-btn admin-btn-primary">
-                    <i class="fas fa-plus"></i> Tambah Lahan Parkir
-                </a>
+            <div class="admin-section-header">
+                <h2 class="admin-section-title">Daftar Lahan Parkir</h2>
+                <div class="admin-section-actions">
+                    <a href="<?= BASEURL ?>/admin/parking-detail.php?action=add" class="admin-btn admin-btn-primary">
+                        <i class="fas fa-plus"></i> Tambah Lahan Parkir
+                    </a>
+                </div>
             </div>
             
             <!-- Parking List -->
@@ -105,9 +107,11 @@ function formatTime($time) {
                     <tbody>
                         <?php if (empty($parkings)): ?>
                             <tr>
-                                <td colspan="8" style="text-align: center; color: var(--spark-text-light); padding: 40px;">
-                                    <i class="fas fa-parking" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
-                                    <p>Belum ada lahan parkir terdaftar</p>
+                                <td colspan="8">
+                                    <div class="admin-empty-state">
+                                        <i class="fas fa-parking"></i>
+                                        <p>Belum ada lahan parkir terdaftar</p>
+                                    </div>
                                 </td>
                             </tr>
                         <?php else: ?>
@@ -141,19 +145,16 @@ function formatTime($time) {
                                         </span>
                                     </td>
                                     <td>
-                                        <div style="display: flex; gap: 8px;">
+                                        <div class="admin-actions-group">
                                             <a href="<?= BASEURL ?>/admin/parking-detail.php?id=<?= $parking['id_tempat'] ?>" 
-                                               class="admin-btn admin-btn-sm admin-btn-secondary">
+                                               class="admin-btn admin-btn-sm admin-btn-secondary" title="Lihat Detail">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <form method="POST" style="display: inline;" 
                                                   onsubmit="return confirm('Yakin ingin menghapus lahan parkir ini?');">
                                                 <input type="hidden" name="action" value="delete">
                                                 <input type="hidden" name="id_tempat" value="<?= $parking['id_tempat'] ?>">
-                                                <button type="submit" class="admin-btn admin-btn-sm admin-btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                                <button type="submit" class="admin-btn admin-btn-sm admin-btn-danger" title="Hapus">
                                         </div>
                                     </td>
                                 </tr>

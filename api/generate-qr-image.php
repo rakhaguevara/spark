@@ -5,7 +5,7 @@
  */
 
 // Get booking ID
-$booking_id = isset($_GET['booking_id']) ? $_GET['booking_id'] : '';
+$booking_id = isset($_GET['booking_id']) ? intval($_GET['booking_id']) : 0;
 
 if (empty($booking_id)) {
     header('Content-Type: image/png');
@@ -20,17 +20,19 @@ if (empty($booking_id)) {
 }
 
 try {
+    // Load database config
+    require_once __DIR__ . '/../config/database.php';
+    
     // Load phpqrcode library
     require_once __DIR__ . '/../lib/phpqrcode-2010100721_1.1.4/phpqrcode/qrlib.php';
     
-    // Database connection
-    $pdo = new PDO("mysql:host=localhost;dbname=spark", "root", "");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Get database connection
+    $pdo = getDBConnection();
     
     // Get QR token
-    $stmt = $pdo->prepare("SELECT qr_token FROM qr_session WHERE id_booking = ?");
+    $stmt = $pdo->prepare("SELECT qr_token FROM qr_session WHERE id_booking = ? LIMIT 1");
     $stmt->execute([$booking_id]);
-    $row = $stmt->fetch();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$row || empty($row['qr_token'])) {
         header('Content-Type: image/png');
@@ -45,11 +47,12 @@ try {
         exit;
     }
     
-    // QR content
+    // QR content - format: qr:TOKEN
     $qr_content = 'qr:' . $row['qr_token'];
     
     // Generate QR code directly to output (no file save)
     // Parameters: data, filename (false=output), error_correction, size, margin
+    header('Content-Type: image/png');
     QRcode::png($qr_content, false, QR_ECLEVEL_M, 10, 2);
     
 } catch (Exception $e) {

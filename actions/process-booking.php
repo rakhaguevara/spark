@@ -32,8 +32,24 @@ $id_tempat = $_POST['id_parkir'] ?? $_POST['id_tempat'] ?? '';
 $id_slot = $_POST['id_slot'] ?? 1; // Default slot for now
 $id_kendaraan = $_POST['id_kendaraan'] ?? '';
 $nomor_plat = trim($_POST['nomor_plat'] ?? '');
-$waktu_mulai = $_POST['waktu_mulai'] ?? '';
+$tanggal_booking = $_POST['tanggal_booking'] ?? '';
+$waktu_mulai_time = $_POST['waktu_mulai'] ?? '';
 $durasi = $_POST['durasi'] ?? $_POST['durasi_jam'] ?? '';
+
+// Combine date and time into full datetime
+if (!empty($tanggal_booking) && !empty($waktu_mulai_time)) {
+    // If waktu_mulai_time is just time (HH:MM), combine with date
+    if (preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $waktu_mulai_time)) {
+        $waktu_mulai = $tanggal_booking . ' ' . $waktu_mulai_time;
+        if (strlen($waktu_mulai_time) == 5) { // HH:MM format
+            $waktu_mulai .= ':00';
+        }
+    } else {
+        $waktu_mulai = $waktu_mulai_time; // Already full datetime
+    }
+} else {
+    $waktu_mulai = $waktu_mulai_time; // Fallback
+}
 
 // TEST MODE: Only validate fields that CANNOT be derived
 if (TEST_MODE) {

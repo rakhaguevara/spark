@@ -69,11 +69,13 @@ function formatRupiah($amount) {
             <?php endif; ?>
             
             <!-- Header -->
-            <div style="margin-bottom: 24px;">
-                <h2 style="margin: 0; font-size: 24px; font-weight: 600;">Daftar Penyedia Lahan Parkir</h2>
-                <p style="color: var(--spark-text-light); margin-top: 8px;">
-                    Kelola dan kontrol penyedia lahan parkir yang terdaftar
-                </p>
+            <div class="admin-section-header">
+                <div>
+                    <h2 class="admin-section-title">Daftar Penyedia Lahan Parkir</h2>
+                    <p class="admin-info-text" style="margin-top: 8px;">
+                        Kelola dan kontrol penyedia lahan parkir yang terdaftar
+                    </p>
+                </div>
             </div>
             
             <!-- Providers List -->
@@ -95,9 +97,11 @@ function formatRupiah($amount) {
                     <tbody>
                         <?php if (empty($providers)): ?>
                             <tr>
-                                <td colspan="9" style="text-align: center; color: var(--spark-text-light); padding: 40px;">
-                                    <i class="fas fa-building" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
-                                    <p>Belum ada penyedia lahan terdaftar</p>
+                                <td colspan="9">
+                                    <div class="admin-empty-state">
+                                        <i class="fas fa-building"></i>
+                                        <p>Belum ada penyedia lahan terdaftar</p>
+                                    </div>
                                 </td>
                             </tr>
                         <?php else: ?>
@@ -137,10 +141,12 @@ function formatRupiah($amount) {
                                         </small>
                                     </td>
                                     <td>
-                                        <a href="<?= BASEURL ?>/admin/users.php?provider_id=<?= $provider['id_pengguna'] ?>" 
-                                           class="admin-btn admin-btn-sm admin-btn-secondary">
-                                            <i class="fas fa-eye"></i> Detail
-                                        </a>
+                                        <div class="admin-actions-group">
+                                            <a href="<?= BASEURL ?>/admin/users.php?provider_id=<?= $provider['id_pengguna'] ?>" 
+                                               class="admin-btn admin-btn-sm admin-btn-secondary" title="Lihat Detail">
+                                                <i class="fas fa-eye"></i> Detail
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
