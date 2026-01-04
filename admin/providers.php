@@ -39,17 +39,18 @@ $stmt = $pdo->query("
 ");
 $providers = $stmt->fetchAll();
 
-function formatRupiah($amount) {
+function formatRupiah($amount)
+{
     return 'Rp ' . number_format($amount, 0, ',', '.');
 }
 ?>
 
 <div class="admin-layout">
     <?php require_once __DIR__ . '/includes/sidebar.php'; ?>
-    
+
     <div class="admin-main">
         <?php require_once __DIR__ . '/includes/navbar.php'; ?>
-        
+
         <div class="admin-content">
             <!-- Flash Messages -->
             <?php if (isset($_SESSION['success'])): ?>
@@ -59,7 +60,7 @@ function formatRupiah($amount) {
                 </div>
                 <?php unset($_SESSION['success']); ?>
             <?php endif; ?>
-            
+
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="admin-flash-message admin-flash-error">
                     <i class="fas fa-exclamation-circle"></i>
@@ -67,7 +68,7 @@ function formatRupiah($amount) {
                 </div>
                 <?php unset($_SESSION['error']); ?>
             <?php endif; ?>
-            
+
             <!-- Header -->
             <div class="admin-section-header">
                 <div>
@@ -77,7 +78,7 @@ function formatRupiah($amount) {
                     </p>
                 </div>
             </div>
-            
+
             <!-- Providers List -->
             <div class="admin-table-container">
                 <table class="admin-table">
@@ -142,8 +143,8 @@ function formatRupiah($amount) {
                                     </td>
                                     <td>
                                         <div class="admin-actions-group">
-                                            <a href="<?= BASEURL ?>/admin/users.php?provider_id=<?= $provider['id_pengguna'] ?>" 
-                                               class="admin-btn admin-btn-sm admin-btn-secondary" title="Lihat Detail">
+                                            <a href="<?= BASEURL ?>/admin/users.php?provider_id=<?= $provider['id_pengguna'] ?>"
+                                                class="admin-btn admin-btn-sm admin-btn-secondary" title="Lihat Detail">
                                                 <i class="fas fa-eye"></i> Detail
                                             </a>
                                         </div>
@@ -154,7 +155,7 @@ function formatRupiah($amount) {
                     </tbody>
                 </table>
             </div>
-            
+
             <!-- Summary Stats -->
             <div class="admin-stats" style="margin-top: 32px;">
                 <div class="admin-stat-card">
@@ -166,7 +167,7 @@ function formatRupiah($amount) {
                     </div>
                     <p class="admin-stat-value"><?= count($providers) ?></p>
                 </div>
-                
+
                 <div class="admin-stat-card">
                     <div class="admin-stat-header">
                         <h3 class="admin-stat-title">Total Lahan</h3>
@@ -178,7 +179,7 @@ function formatRupiah($amount) {
                         <?= array_sum(array_column($providers, 'total_lahan')) ?>
                     </p>
                 </div>
-                
+
                 <div class="admin-stat-card">
                     <div class="admin-stat-header">
                         <h3 class="admin-stat-title">Total Pendapatan</h3>
@@ -196,4 +197,3 @@ function formatRupiah($amount) {
 </div>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
-

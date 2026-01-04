@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PROCESS BOOKING (TEST MODE - NO PAYMENT)
  * Saves booking to existing database schema and generates QR ticket
@@ -58,7 +59,7 @@ if (TEST_MODE) {
     if (empty($nomor_plat)) $missing_fields[] = 'nomor_plat';
     if (empty($waktu_mulai)) $missing_fields[] = 'waktu_mulai';
     if (empty($durasi)) $missing_fields[] = 'durasi/durasi_jam';
-    
+
     if (!empty($missing_fields)) {
         error_log("Missing fields: " . implode(', ', $missing_fields));
         error_log("POST data: " . print_r($_POST, true));
@@ -72,33 +73,33 @@ if (TEST_MODE) {
 try {
     $pdo = getDBConnection();
     $pdo->beginTransaction();
-    
+
     // Step 1: Get parking details (for price calculation)
     $stmt = $pdo->prepare("SELECT harga_per_jam FROM tempat_parkir WHERE id_tempat = ?");
     $stmt->execute([$id_tempat]);
     $parking = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if (!$parking) {
         throw new Exception("Parking location not found");
     }
-    
+
     // Step 2: Calculate total_harga (SERVER-SIDE)
     $total_harga = $parking['harga_per_jam'] * $durasi;
-    
+
     // Step 3: Calculate waktu_selesai (SERVER-SIDE)
     $waktu_selesai = date('Y-m-d H:i:s', strtotime($waktu_mulai) + ($durasi * 3600));
-    
+
     // Step 4: Check or create vehicle in kendaraan_pengguna
     $secret_salt = defined('SECRET_SALT') ? SECRET_SALT : 'default-salt-change-me';
     $plat_hash = hash('sha256', $nomor_plat . $secret_salt);
     $plat_hint = substr($nomor_plat, -4);
-    
+
     // If id_kendaraan provided, get id_jenis from it
     if (!empty($id_kendaraan)) {
         $stmt = $pdo->prepare("SELECT id_jenis FROM kendaraan_pengguna WHERE id_kendaraan = ?");
         $stmt->execute([$id_kendaraan]);
         $vehicle = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($vehicle) {
             $id_jenis = $vehicle['id_jenis'];
         } else {
@@ -112,11 +113,11 @@ try {
         ");
         $stmt->execute([$user['id_pengguna'], $plat_hash]);
         $vehicle = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$vehicle) {
             // Need to get id_jenis from POST or default to 1 (assuming first vehicle type)
             $id_jenis = $_POST['id_jenis_kendaraan'] ?? $_POST['id_jenis'] ?? 1;
-            
+
             // Insert new vehicle
             $stmt = $pdo->prepare("
                 INSERT INTO kendaraan_pengguna (id_pengguna, id_jenis, plat_hash, plat_hint)
@@ -129,10 +130,10 @@ try {
             $id_jenis = $vehicle['id_jenis'];
         }
     }
-    
+
     // Step 2: Generate QR secret
     $qr_secret = bin2hex(random_bytes(32)); // 64 char hex
-    
+
     // Step 3: Insert booking
     $stmt = $pdo->prepare("
         INSERT INTO booking_parkir (
@@ -141,7 +142,7 @@ try {
             status_booking, qr_secret
         ) VALUES (?, ?, ?, ?, ?, ?, ?, 'confirmed', ?)
     ");
-    
+
     $stmt->execute([
         $user['id_pengguna'],
         $id_tempat,
@@ -152,22 +153,22 @@ try {
         $total_harga,
         $qr_secret
     ]);
-    
+
     $id_booking = $pdo->lastInsertId();
-    
+
     // Step 4: Generate QR token
     $qr_token = hash('sha256', $qr_secret . $id_booking . time());
-    
+
     // Calculate expiry (booking end time + 1 hour tolerance)
     $expires_at = date('Y-m-d H:i:s', strtotime($waktu_selesai) + 3600);
-    
+
     // Step 5: Insert QR session
     $stmt = $pdo->prepare("
         INSERT INTO qr_session (id_booking, qr_token, expires_at)
         VALUES (?, ?, ?)
     ");
     $stmt->execute([$id_booking, $qr_token, $expires_at]);
-    
+
     // Step 6: Update slot status
     $stmt = $pdo->prepare("
         UPDATE slot_parkir 
@@ -175,14 +176,13 @@ try {
         WHERE id_slot = ?
     ");
     $stmt->execute([$id_slot]);
-    
+
     // Commit transaction
     $pdo->commit();
-    
+
     // Redirect to My Ticket page
     header('Location: ' . BASEURL . '/pages/my-ticket.php?success=1&booking=' . $id_booking);
     exit;
-    
 } catch (PDOException $e) {
     $pdo->rollBack();
     error_log("Booking error: " . $e->getMessage());

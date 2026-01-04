@@ -8,7 +8,7 @@
 if (!defined('BASEURL')) {
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    
+
     // Docker env takes priority
     $envBaseurl = getenv('BASEURL');
     if ($envBaseurl) {
@@ -16,7 +16,7 @@ if (!defined('BASEURL')) {
     } else {
         // Deteksi dari SCRIPT_NAME
         $scriptPath = $_SERVER['SCRIPT_NAME'] ?? '';
-        
+
         // Jika file diakses dari admin/login.php, naik 2 level
         if (strpos($scriptPath, '/admin/') !== false || strpos($scriptPath, '/functions/') !== false) {
             $basePath = dirname(dirname($scriptPath));
@@ -26,17 +26,21 @@ if (!defined('BASEURL')) {
             // Default detection
             $basePath = '/spark-final';
         }
-        
+
         // Normalize path
         $basePath = str_replace('\\', '/', $basePath);
         $basePath = rtrim($basePath, '/');
-        
+
         // Jika masih kosong, gunakan default
         if (empty($basePath) || $basePath === '/' || $basePath === '.') {
             $basePath = '/spark-final';
         }
-        
+
         define('BASEURL', $protocol . '://' . $host . $basePath);
     }
 }
 
+// Security salt for hashing sensitive data
+if (!defined('SECRET_SALT')) {
+    define('SECRET_SALT', getenv('SECRET_SALT') ?: 'spark-default-salt-change-in-production-2026');
+}

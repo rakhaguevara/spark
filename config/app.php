@@ -1,7 +1,6 @@
 <?php
-// Sesuaikan dengan lokasi folder Anda
-// Sesuaikan dengan lokasi folder Anda, atau gunakan env var untuk Docker
-define('BASEURL', getenv('BASEURL') ?: 'http://localhost/spark');
+// Load config.php untuk BASEURL dan konstanta lainnya
+require_once __DIR__ . '/config.php';
 
 // Atau jika pakai virtual host: 
 // define('BASEURL', 'http://spark.test');

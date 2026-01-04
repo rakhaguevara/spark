@@ -1,4 +1,5 @@
 <?php
+
 /**
  * QR CODE GENERATOR - OFFLINE (phpqrcode library)
  * Generates QR code using local phpqrcode library
@@ -22,18 +23,18 @@ if (empty($booking_id)) {
 try {
     // Load database config
     require_once __DIR__ . '/../config/database.php';
-    
+
     // Load phpqrcode library
     require_once __DIR__ . '/../lib/phpqrcode-2010100721_1.1.4/phpqrcode/qrlib.php';
-    
+
     // Get database connection
     $pdo = getDBConnection();
-    
+
     // Get QR token
     $stmt = $pdo->prepare("SELECT qr_token FROM qr_session WHERE id_booking = ? LIMIT 1");
     $stmt->execute([$booking_id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if (!$row || empty($row['qr_token'])) {
         header('Content-Type: image/png');
         $im = imagecreatetruecolor(300, 300);
@@ -46,15 +47,14 @@ try {
         imagedestroy($im);
         exit;
     }
-    
+
     // QR content - format: qr:TOKEN
     $qr_content = 'qr:' . $row['qr_token'];
-    
+
     // Generate QR code directly to output (no file save)
     // Parameters: data, filename (false=output), error_correction, size, margin
     header('Content-Type: image/png');
     QRcode::png($qr_content, false, QR_ECLEVEL_M, 10, 2);
-    
 } catch (Exception $e) {
     header('Content-Type: image/png');
     $im = imagecreatetruecolor(300, 300);

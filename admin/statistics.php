@@ -80,17 +80,18 @@ $stmt = $pdo->query("
 ");
 $top_users = $stmt->fetchAll();
 
-function formatRupiah($amount) {
+function formatRupiah($amount)
+{
     return 'Rp ' . number_format($amount, 0, ',', '.');
 }
 ?>
 
 <div class="admin-layout">
     <?php require_once __DIR__ . '/includes/sidebar.php'; ?>
-    
+
     <div class="admin-main">
         <?php require_once __DIR__ . '/includes/navbar.php'; ?>
-        
+
         <div class="admin-content">
             <!-- Header -->
             <div class="admin-section-header">
@@ -101,7 +102,7 @@ function formatRupiah($amount) {
                     </p>
                 </div>
             </div>
-            
+
             <!-- Usage Statistics by Parking -->
             <div class="admin-table-container" style="margin-bottom: 32px;">
                 <div class="admin-table-header">
@@ -151,7 +152,7 @@ function formatRupiah($amount) {
                                         <?= $stat['slot_terpakai'] ?? 0 ?>/<?= $stat['total_slot'] ?? 0 ?>
                                     </td>
                                     <td>
-                                        <?php 
+                                        <?php
                                         $rate = $stat['utilization_rate'] ?? 0;
                                         $badge_class = $rate >= 70 ? 'admin-badge-success' : ($rate >= 40 ? 'admin-badge-warning' : 'admin-badge-danger');
                                         ?>
@@ -165,7 +166,7 @@ function formatRupiah($amount) {
                     </tbody>
                 </table>
             </div>
-            
+
             <!-- Monthly Statistics -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
                 <div class="admin-table-container">
@@ -201,7 +202,7 @@ function formatRupiah($amount) {
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Daily Statistics -->
                 <div class="admin-table-container">
                     <div class="admin-table-header">
@@ -237,7 +238,7 @@ function formatRupiah($amount) {
                     </table>
                 </div>
             </div>
-            
+
             <!-- Hourly Statistics -->
             <div class="admin-table-container" style="margin-bottom: 32px;">
                 <div class="admin-table-header">
@@ -259,9 +260,9 @@ function formatRupiah($amount) {
                                 </td>
                             </tr>
                         <?php else: ?>
-                            <?php 
+                            <?php
                             $max_booking = max(array_column($hourly_stats, 'jumlah_booking'));
-                            foreach ($hourly_stats as $hour): 
+                            foreach ($hourly_stats as $hour):
                                 $percentage = $max_booking > 0 ? ($hour['jumlah_booking'] / $max_booking) * 100 : 0;
                             ?>
                                 <tr>
@@ -282,7 +283,7 @@ function formatRupiah($amount) {
                     </tbody>
                 </table>
             </div>
-            
+
             <!-- Top Users -->
             <div class="admin-table-container">
                 <div class="admin-table-header">
@@ -328,4 +329,3 @@ function formatRupiah($amount) {
 </div>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
-

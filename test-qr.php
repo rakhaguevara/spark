@@ -11,7 +11,7 @@ if ($row) {
     $qr_content = 'qr:' . $row['qr_token'];
     $file = '/tmp/test-qr.png';
     QRcode::png($qr_content, $file, QR_ECLEVEL_M, 10, 2);
-    
+
     if (file_exists($file)) {
         echo "QR image generated: " . filesize($file) . " bytes\n";
         unlink($file);

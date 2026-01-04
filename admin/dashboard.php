@@ -140,11 +140,13 @@ foreach ($parking_growth as $data) {
     ];
 }
 
-function formatRupiah($amount) {
+function formatRupiah($amount)
+{
     return 'Rp ' . number_format($amount, 0, ',', '.');
 }
 
-function getStatusBadge($status) {
+function getStatusBadge($status)
+{
     $badges = [
         'pending' => 'admin-badge-warning',
         'confirmed' => 'admin-badge-info',
@@ -157,10 +159,10 @@ function getStatusBadge($status) {
 
 <div class="admin-layout">
     <?php require_once __DIR__ . '/includes/sidebar.php'; ?>
-    
+
     <div class="admin-main">
         <?php require_once __DIR__ . '/includes/navbar.php'; ?>
-        
+
         <div class="admin-content">
             <!-- Flash Messages -->
             <?php if (isset($_SESSION['success'])): ?>
@@ -170,7 +172,7 @@ function getStatusBadge($status) {
                 </div>
                 <?php unset($_SESSION['success']); ?>
             <?php endif; ?>
-            
+
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="admin-flash-message admin-flash-error">
                     <i class="fas fa-exclamation-circle"></i>
@@ -178,7 +180,7 @@ function getStatusBadge($status) {
                 </div>
                 <?php unset($_SESSION['error']); ?>
             <?php endif; ?>
-            
+
             <!-- Welcome Header -->
             <div class="admin-welcome-header">
                 <div>
@@ -201,7 +203,7 @@ function getStatusBadge($status) {
                         <i class="fas fa-building"></i> <?= $stats['total_providers'] ?> penyedia
                     </div>
                 </div>
-                
+
                 <div class="admin-stat-card">
                     <div class="admin-stat-header">
                         <h3 class="admin-stat-title">Total Pengguna</h3>
@@ -214,7 +216,7 @@ function getStatusBadge($status) {
                         <i class="fas fa-user-check"></i> Pengguna terdaftar
                     </div>
                 </div>
-                
+
                 <div class="admin-stat-card">
                     <div class="admin-stat-header">
                         <h3 class="admin-stat-title">Total Transaksi</h3>
@@ -227,7 +229,7 @@ function getStatusBadge($status) {
                         <i class="fas fa-calendar-day"></i> <?= $stats['today_transactions'] ?> hari ini
                     </div>
                 </div>
-                
+
                 <div class="admin-stat-card">
                     <div class="admin-stat-header">
                         <h3 class="admin-stat-title">Total Pendapatan</h3>
@@ -292,7 +294,7 @@ function getStatusBadge($status) {
                     </div>
                 </div>
             </div>
-            
+
             <!-- Content Grid -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
                 <!-- Popular Parkings -->
@@ -318,8 +320,8 @@ function getStatusBadge($status) {
                                 <?php foreach ($popular_parkings as $parking): ?>
                                     <tr>
                                         <td>
-                                            <a href="<?= BASEURL ?>/admin/parking-detail.php?id=<?= $parking['id_tempat'] ?>" 
-                                               style="color: var(--spark-yellow);">
+                                            <a href="<?= BASEURL ?>/admin/parking-detail.php?id=<?= $parking['id_tempat'] ?>"
+                                                style="color: var(--spark-yellow);">
                                                 <?= htmlspecialchars($parking['nama_tempat']) ?>
                                             </a>
                                         </td>
@@ -334,7 +336,7 @@ function getStatusBadge($status) {
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Recent Transactions -->
                 <div class="admin-table-container">
                     <div class="admin-table-header">
@@ -377,7 +379,7 @@ function getStatusBadge($status) {
                     </table>
                 </div>
             </div>
-            
+
             <!-- Monthly Statistics Chart -->
             <div class="admin-table-container">
                 <div class="admin-table-header">
@@ -417,232 +419,231 @@ function getStatusBadge($status) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <script>
-// Chart Configuration
-const chartColors = {
-    yellow: '#FFE100',
-    yellowLight: 'rgba(255, 225, 0, 0.2)',
-    yellowGradient: 'rgba(255, 225, 0, 0.6)',
-    green: '#10b981',
-    greenLight: 'rgba(16, 185, 129, 0.2)',
-    blue: '#3b82f6',
-    blueLight: 'rgba(59, 130, 246, 0.2)',
-    text: '#e5e5e5',
-    grid: 'rgba(255, 255, 255, 0.05)'
-};
+    // Chart Configuration
+    const chartColors = {
+        yellow: '#FFE100',
+        yellowLight: 'rgba(255, 225, 0, 0.2)',
+        yellowGradient: 'rgba(255, 225, 0, 0.6)',
+        green: '#10b981',
+        greenLight: 'rgba(16, 185, 129, 0.2)',
+        blue: '#3b82f6',
+        blueLight: 'rgba(59, 130, 246, 0.2)',
+        text: '#e5e5e5',
+        grid: 'rgba(255, 255, 255, 0.05)'
+    };
 
-const defaultOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            display: false
-        },
-        tooltip: {
-            backgroundColor: 'rgba(26, 26, 26, 0.95)',
-            titleColor: chartColors.yellow,
-            bodyColor: chartColors.text,
-            borderColor: chartColors.yellow,
-            borderWidth: 1,
-            padding: 12,
-            displayColors: false,
-            titleFont: {
-                size: 13,
-                weight: '600'
-            },
-            bodyFont: {
-                size: 12
-            }
-        }
-    },
-    scales: {
-        x: {
-            grid: {
-                color: chartColors.grid,
-                drawBorder: false
-            },
-            ticks: {
-                color: chartColors.text,
-                font: {
-                    size: 11
-                }
-            }
-        },
-        y: {
-            beginAtZero: true,
-            grid: {
-                color: chartColors.grid,
-                drawBorder: false
-            },
-            ticks: {
-                color: chartColors.text,
-                font: {
-                    size: 11
-                }
-            }
-        }
-    }
-};
-
-// Prepare data from PHP
-const userGrowthData = <?= json_encode(array_map(function($item) {
-    return [
-        'label' => date('M Y', strtotime($item['bulan'] . '-01')),
-        'value' => $item['total']
-    ];
-}, $cumulative_users)) ?>;
-
-const parkingGrowthData = <?= json_encode(array_map(function($item) {
-    return [
-        'label' => date('M Y', strtotime($item['bulan'] . '-01')),
-        'value' => $item['total']
-    ];
-}, $cumulative_parking)) ?>;
-
-const revenueData = <?= json_encode(array_map(function($item) {
-    return [
-        'label' => date('M Y', strtotime($item['bulan'] . '-01')),
-        'value' => $item['pendapatan']
-    ];
-}, $monthly_stats)) ?>;
-
-// User Growth Chart
-const userCtx = document.getElementById('userGrowthChart').getContext('2d');
-const userGradient = userCtx.createLinearGradient(0, 0, 0, 300);
-userGradient.addColorStop(0, chartColors.greenLight);
-userGradient.addColorStop(1, 'rgba(16, 185, 129, 0.01)');
-
-new Chart(userCtx, {
-    type: 'line',
-    data: {
-        labels: userGrowthData.map(d => d.label),
-        datasets: [{
-            label: 'Total Pengguna',
-            data: userGrowthData.map(d => d.value),
-            borderColor: chartColors.green,
-            backgroundColor: userGradient,
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            pointBackgroundColor: chartColors.green,
-            pointBorderColor: '#1a1a1a',
-            pointBorderWidth: 2
-        }]
-    },
-    options: {
-        ...defaultOptions,
+    const defaultOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-            ...defaultOptions.plugins,
+            legend: {
+                display: false
+            },
             tooltip: {
-                ...defaultOptions.plugins.tooltip,
-                titleColor: chartColors.green,
-                borderColor: chartColors.green,
-                callbacks: {
-                    label: function(context) {
-                        return 'Total: ' + context.parsed.y + ' pengguna';
-                    }
-                }
-            }
-        }
-    }
-});
-
-// Parking Growth Chart
-const parkingCtx = document.getElementById('parkingGrowthChart').getContext('2d');
-const parkingGradient = parkingCtx.createLinearGradient(0, 0, 0, 300);
-parkingGradient.addColorStop(0, chartColors.blueLight);
-parkingGradient.addColorStop(1, 'rgba(59, 130, 246, 0.01)');
-
-new Chart(parkingCtx, {
-    type: 'line',
-    data: {
-        labels: parkingGrowthData.map(d => d.label),
-        datasets: [{
-            label: 'Total Lahan Parkir',
-            data: parkingGrowthData.map(d => d.value),
-            borderColor: chartColors.blue,
-            backgroundColor: parkingGradient,
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            pointBackgroundColor: chartColors.blue,
-            pointBorderColor: '#1a1a1a',
-            pointBorderWidth: 2
-        }]
-    },
-    options: {
-        ...defaultOptions,
-        plugins: {
-            ...defaultOptions.plugins,
-            tooltip: {
-                ...defaultOptions.plugins.tooltip,
-                titleColor: chartColors.blue,
-                borderColor: chartColors.blue,
-                callbacks: {
-                    label: function(context) {
-                        return 'Total: ' + context.parsed.y + ' lahan';
-                    }
-                }
-            }
-        }
-    }
-});
-
-// Revenue Trend Chart
-const revenueCtx = document.getElementById('revenueTrendChart').getContext('2d');
-const revenueGradient = revenueCtx.createLinearGradient(0, 0, 0, 300);
-revenueGradient.addColorStop(0, chartColors.yellowGradient);
-revenueGradient.addColorStop(1, chartColors.yellowLight);
-
-new Chart(revenueCtx, {
-    type: 'line',
-    data: {
-        labels: revenueData.map(d => d.label),
-        datasets: [{
-            label: 'Pendapatan',
-            data: revenueData.map(d => d.value),
-            borderColor: chartColors.yellow,
-            backgroundColor: revenueGradient,
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            pointBackgroundColor: chartColors.yellow,
-            pointBorderColor: '#1a1a1a',
-            pointBorderWidth: 3
-        }]
-    },
-    options: {
-        ...defaultOptions,
-        plugins: {
-            ...defaultOptions.plugins,
-            tooltip: {
-                ...defaultOptions.plugins.tooltip,
-                callbacks: {
-                    label: function(context) {
-                        return 'Pendapatan: Rp ' + context.parsed.y.toLocaleString('id-ID');
-                    }
+                backgroundColor: 'rgba(26, 26, 26, 0.95)',
+                titleColor: chartColors.yellow,
+                bodyColor: chartColors.text,
+                borderColor: chartColors.yellow,
+                borderWidth: 1,
+                padding: 12,
+                displayColors: false,
+                titleFont: {
+                    size: 13,
+                    weight: '600'
+                },
+                bodyFont: {
+                    size: 12
                 }
             }
         },
         scales: {
-            ...defaultOptions.scales,
-            y: {
-                ...defaultOptions.scales.y,
+            x: {
+                grid: {
+                    color: chartColors.grid,
+                    drawBorder: false
+                },
                 ticks: {
-                    ...defaultOptions.scales.y.ticks,
-                    callback: function(value) {
-                        return 'Rp ' + (value / 1000) + 'k';
+                    color: chartColors.text,
+                    font: {
+                        size: 11
+                    }
+                }
+            },
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: chartColors.grid,
+                    drawBorder: false
+                },
+                ticks: {
+                    color: chartColors.text,
+                    font: {
+                        size: 11
                     }
                 }
             }
         }
-    }
-});
+    };
+
+    // Prepare data from PHP
+    const userGrowthData = <?= json_encode(array_map(function ($item) {
+                                return [
+                                    'label' => date('M Y', strtotime($item['bulan'] . '-01')),
+                                    'value' => $item['total']
+                                ];
+                            }, $cumulative_users)) ?>;
+
+    const parkingGrowthData = <?= json_encode(array_map(function ($item) {
+                                    return [
+                                        'label' => date('M Y', strtotime($item['bulan'] . '-01')),
+                                        'value' => $item['total']
+                                    ];
+                                }, $cumulative_parking)) ?>;
+
+    const revenueData = <?= json_encode(array_map(function ($item) {
+                            return [
+                                'label' => date('M Y', strtotime($item['bulan'] . '-01')),
+                                'value' => $item['pendapatan']
+                            ];
+                        }, $monthly_stats)) ?>;
+
+    // User Growth Chart
+    const userCtx = document.getElementById('userGrowthChart').getContext('2d');
+    const userGradient = userCtx.createLinearGradient(0, 0, 0, 300);
+    userGradient.addColorStop(0, chartColors.greenLight);
+    userGradient.addColorStop(1, 'rgba(16, 185, 129, 0.01)');
+
+    new Chart(userCtx, {
+        type: 'line',
+        data: {
+            labels: userGrowthData.map(d => d.label),
+            datasets: [{
+                label: 'Total Pengguna',
+                data: userGrowthData.map(d => d.value),
+                borderColor: chartColors.green,
+                backgroundColor: userGradient,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: chartColors.green,
+                pointBorderColor: '#1a1a1a',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            ...defaultOptions,
+            plugins: {
+                ...defaultOptions.plugins,
+                tooltip: {
+                    ...defaultOptions.plugins.tooltip,
+                    titleColor: chartColors.green,
+                    borderColor: chartColors.green,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Total: ' + context.parsed.y + ' pengguna';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Parking Growth Chart
+    const parkingCtx = document.getElementById('parkingGrowthChart').getContext('2d');
+    const parkingGradient = parkingCtx.createLinearGradient(0, 0, 0, 300);
+    parkingGradient.addColorStop(0, chartColors.blueLight);
+    parkingGradient.addColorStop(1, 'rgba(59, 130, 246, 0.01)');
+
+    new Chart(parkingCtx, {
+        type: 'line',
+        data: {
+            labels: parkingGrowthData.map(d => d.label),
+            datasets: [{
+                label: 'Total Lahan Parkir',
+                data: parkingGrowthData.map(d => d.value),
+                borderColor: chartColors.blue,
+                backgroundColor: parkingGradient,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: chartColors.blue,
+                pointBorderColor: '#1a1a1a',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            ...defaultOptions,
+            plugins: {
+                ...defaultOptions.plugins,
+                tooltip: {
+                    ...defaultOptions.plugins.tooltip,
+                    titleColor: chartColors.blue,
+                    borderColor: chartColors.blue,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Total: ' + context.parsed.y + ' lahan';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Revenue Trend Chart
+    const revenueCtx = document.getElementById('revenueTrendChart').getContext('2d');
+    const revenueGradient = revenueCtx.createLinearGradient(0, 0, 0, 300);
+    revenueGradient.addColorStop(0, chartColors.yellowGradient);
+    revenueGradient.addColorStop(1, chartColors.yellowLight);
+
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: revenueData.map(d => d.label),
+            datasets: [{
+                label: 'Pendapatan',
+                data: revenueData.map(d => d.value),
+                borderColor: chartColors.yellow,
+                backgroundColor: revenueGradient,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: chartColors.yellow,
+                pointBorderColor: '#1a1a1a',
+                pointBorderWidth: 3
+            }]
+        },
+        options: {
+            ...defaultOptions,
+            plugins: {
+                ...defaultOptions.plugins,
+                tooltip: {
+                    ...defaultOptions.plugins.tooltip,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Pendapatan: Rp ' + context.parsed.y.toLocaleString('id-ID');
+                        }
+                    }
+                }
+            },
+            scales: {
+                ...defaultOptions.scales,
+                y: {
+                    ...defaultOptions.scales.y,
+                    ticks: {
+                        ...defaultOptions.scales.y.ticks,
+                        callback: function(value) {
+                            return 'Rp ' + (value / 1000) + 'k';
+                        }
+                    }
+                }
+            }
+        }
+    });
 </script>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
-

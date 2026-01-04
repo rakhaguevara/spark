@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM tempat_parkir WHERE id_pemilik = ?");
                 $stmt->execute([$id]);
                 $hasParking = $stmt->fetch()['count'] > 0;
-                
+
                 if ($hasParking) {
                     $_SESSION['error'] = 'Tidak dapat menghapus pengguna yang memiliki lahan parkir';
                 } else {
@@ -94,10 +94,10 @@ foreach ($role_counts as $rc) {
 
 <div class="admin-layout">
     <?php require_once __DIR__ . '/includes/sidebar.php'; ?>
-    
+
     <div class="admin-main">
         <?php require_once __DIR__ . '/includes/navbar.php'; ?>
-        
+
         <div class="admin-content">
             <!-- Flash Messages -->
             <?php if (isset($_SESSION['success'])): ?>
@@ -107,7 +107,7 @@ foreach ($role_counts as $rc) {
                 </div>
                 <?php unset($_SESSION['success']); ?>
             <?php endif; ?>
-            
+
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="admin-flash-message admin-flash-error">
                     <i class="fas fa-exclamation-circle"></i>
@@ -115,7 +115,7 @@ foreach ($role_counts as $rc) {
                 </div>
                 <?php unset($_SESSION['error']); ?>
             <?php endif; ?>
-            
+
             <!-- Header -->
             <div class="admin-section-header">
                 <div>
@@ -124,24 +124,24 @@ foreach ($role_counts as $rc) {
                         Kelola data akun pengguna dan penyedia lahan parkir
                     </p>
                 </div>
-                
+
                 <!-- Filter -->
                 <div class="admin-section-actions">
-                    <a href="?role=all" 
-                       class="admin-btn admin-btn-sm <?= $filter_role === 'all' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
+                    <a href="?role=all"
+                        class="admin-btn admin-btn-sm <?= $filter_role === 'all' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
                         Semua
                     </a>
-                    <a href="?role=1" 
-                       class="admin-btn admin-btn-sm <?= $filter_role === '1' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
+                    <a href="?role=1"
+                        class="admin-btn admin-btn-sm <?= $filter_role === '1' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
                         User (<?= $role_counts_map[1] ?? 0 ?>)
                     </a>
-                    <a href="?role=2" 
-                       class="admin-btn admin-btn-sm <?= $filter_role === '2' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
+                    <a href="?role=2"
+                        class="admin-btn admin-btn-sm <?= $filter_role === '2' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
                         Admin (<?= $role_counts_map[2] ?? 0 ?>)
                     </a>
                 </div>
             </div>
-            
+
             <!-- Users List -->
             <div class="admin-table-container">
                 <table class="admin-table">
@@ -184,8 +184,8 @@ foreach ($role_counts as $rc) {
                                     </td>
                                     <td>
                                         <?php if ($user['total_lahan'] > 0): ?>
-                                            <a href="<?= BASEURL ?>/admin/parking.php?provider=<?= $user['id_pengguna'] ?>" 
-                                               style="color: var(--spark-yellow);">
+                                            <a href="<?= BASEURL ?>/admin/parking.php?provider=<?= $user['id_pengguna'] ?>"
+                                                style="color: var(--spark-yellow);">
                                                 <?= $user['total_lahan'] ?> lahan
                                             </a>
                                         <?php else: ?>
@@ -210,8 +210,8 @@ foreach ($role_counts as $rc) {
                                     <td>
                                         <?php if ($user['role_pengguna'] != 2): ?>
                                             <div class="admin-actions-group">
-                                                <form method="POST" style="display: inline;" 
-                                                      onsubmit="return confirm('Yakin ingin menghapus akun ini?');">
+                                                <form method="POST" style="display: inline;"
+                                                    onsubmit="return confirm('Yakin ingin menghapus akun ini?');">
                                                     <input type="hidden" name="action" value="delete">
                                                     <input type="hidden" name="id_pengguna" value="<?= $user['id_pengguna'] ?>">
                                                     <button type="submit" class="admin-btn admin-btn-sm admin-btn-danger" title="Hapus">
@@ -234,4 +234,3 @@ foreach ($role_counts as $rc) {
 </div>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
-

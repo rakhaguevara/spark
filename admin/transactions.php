@@ -58,11 +58,13 @@ $stmt = $pdo->query("
 ");
 $stats = $stmt->fetch();
 
-function formatRupiah($amount) {
+function formatRupiah($amount)
+{
     return 'Rp ' . number_format($amount, 0, ',', '.');
 }
 
-function getStatusBadge($status) {
+function getStatusBadge($status)
+{
     $badges = [
         'pending' => 'admin-badge-warning',
         'confirmed' => 'admin-badge-info',
@@ -75,10 +77,10 @@ function getStatusBadge($status) {
 
 <div class="admin-layout">
     <?php require_once __DIR__ . '/includes/sidebar.php'; ?>
-    
+
     <div class="admin-main">
         <?php require_once __DIR__ . '/includes/navbar.php'; ?>
-        
+
         <div class="admin-content">
             <!-- Flash Messages -->
             <?php if (isset($_SESSION['success'])): ?>
@@ -88,7 +90,7 @@ function getStatusBadge($status) {
                 </div>
                 <?php unset($_SESSION['success']); ?>
             <?php endif; ?>
-            
+
             <!-- Statistics -->
             <div class="admin-stats">
                 <div class="admin-stat-card">
@@ -100,7 +102,7 @@ function getStatusBadge($status) {
                     </div>
                     <p class="admin-stat-value"><?= $stats['total'] ?></p>
                 </div>
-                
+
                 <div class="admin-stat-card">
                     <div class="admin-stat-header">
                         <h3 class="admin-stat-title">Total Pendapatan</h3>
@@ -110,7 +112,7 @@ function getStatusBadge($status) {
                     </div>
                     <p class="admin-stat-value"><?= formatRupiah($stats['total_pendapatan'] ?? 0) ?></p>
                 </div>
-                
+
                 <div class="admin-stat-card">
                     <div class="admin-stat-header">
                         <h3 class="admin-stat-title">Pending</h3>
@@ -120,7 +122,7 @@ function getStatusBadge($status) {
                     </div>
                     <p class="admin-stat-value"><?= $stats['pending'] ?? 0 ?></p>
                 </div>
-                
+
                 <div class="admin-stat-card">
                     <div class="admin-stat-header">
                         <h3 class="admin-stat-title">Completed</h3>
@@ -131,35 +133,35 @@ function getStatusBadge($status) {
                     <p class="admin-stat-value"><?= $stats['completed'] ?? 0 ?></p>
                 </div>
             </div>
-            
+
             <!-- Filters -->
             <div class="admin-table-container" style="margin-bottom: 28px;">
                 <div style="padding: 20px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                     <span style="color: var(--spark-text-light); font-weight: 500;">Filter:</span>
-                    <a href="?status=all" 
-                       class="admin-btn admin-btn-sm <?= $filter_status === 'all' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
+                    <a href="?status=all"
+                        class="admin-btn admin-btn-sm <?= $filter_status === 'all' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
                         Semua
                     </a>
-                    <a href="?status=pending" 
-                       class="admin-btn admin-btn-sm <?= $filter_status === 'pending' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
+                    <a href="?status=pending"
+                        class="admin-btn admin-btn-sm <?= $filter_status === 'pending' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
                         Pending
                     </a>
-                    <a href="?status=confirmed" 
-                       class="admin-btn admin-btn-sm <?= $filter_status === 'confirmed' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
+                    <a href="?status=confirmed"
+                        class="admin-btn admin-btn-sm <?= $filter_status === 'confirmed' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
                         Confirmed
                     </a>
-                    <a href="?status=completed" 
-                       class="admin-btn admin-btn-sm <?= $filter_status === 'completed' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
+                    <a href="?status=completed"
+                        class="admin-btn admin-btn-sm <?= $filter_status === 'completed' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
                         Completed
                     </a>
-                    <a href="?status=cancelled" 
-                       class="admin-btn admin-btn-sm <?= $filter_status === 'cancelled' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
+                    <a href="?status=cancelled"
+                        class="admin-btn admin-btn-sm <?= $filter_status === 'cancelled' ? 'admin-btn-primary' : 'admin-btn-secondary' ?>">
                         Cancelled
                     </a>
                     <form method="GET" style="display: flex; gap: 8px; margin-left: auto;">
                         <input type="hidden" name="status" value="<?= $filter_status ?>">
-                        <input type="date" name="date" value="<?= $filter_date ?>" 
-                               class="admin-form-input" style="width: auto; padding: 8px 12px;">
+                        <input type="date" name="date" value="<?= $filter_date ?>"
+                            class="admin-form-input" style="width: auto; padding: 8px 12px;">
                         <button type="submit" class="admin-btn admin-btn-sm admin-btn-primary">
                             <i class="fas fa-search"></i>
                         </button>
@@ -171,7 +173,7 @@ function getStatusBadge($status) {
                     </form>
                 </div>
             </div>
-            
+
             <!-- Transactions List -->
             <div class="admin-table-container">
                 <table class="admin-table">
@@ -220,7 +222,7 @@ function getStatusBadge($status) {
                                     <td>
                                         <div><?= date('d/m/Y', strtotime($transaction['waktu_mulai'])) ?></div>
                                         <small style="color: var(--spark-text-light);">
-                                            <?= date('H:i', strtotime($transaction['waktu_mulai'])) ?> - 
+                                            <?= date('H:i', strtotime($transaction['waktu_mulai'])) ?> -
                                             <?= date('H:i', strtotime($transaction['waktu_selesai'])) ?>
                                         </small>
                                     </td>
@@ -258,4 +260,3 @@ function getStatusBadge($status) {
 </div>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
-

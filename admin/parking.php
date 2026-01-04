@@ -13,11 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Delete slots first
                 $stmt = $pdo->prepare("DELETE FROM slot_parkir WHERE id_tempat = ?");
                 $stmt->execute([$id]);
-                
+
                 // Delete parking place
                 $stmt = $pdo->prepare("DELETE FROM tempat_parkir WHERE id_tempat = ?");
                 $stmt->execute([$id]);
-                
+
                 $_SESSION['success'] = 'Lahan parkir berhasil dihapus';
             } catch (PDOException $e) {
                 $_SESSION['error'] = 'Gagal menghapus lahan parkir';
@@ -46,21 +46,23 @@ $stmt = $pdo->query("
 ");
 $parkings = $stmt->fetchAll();
 
-function formatRupiah($amount) {
+function formatRupiah($amount)
+{
     return 'Rp ' . number_format($amount, 0, ',', '.');
 }
 
-function formatTime($time) {
+function formatTime($time)
+{
     return date('H:i', strtotime($time));
 }
 ?>
 
 <div class="admin-layout">
     <?php require_once __DIR__ . '/includes/sidebar.php'; ?>
-    
+
     <div class="admin-main">
         <?php require_once __DIR__ . '/includes/navbar.php'; ?>
-        
+
         <div class="admin-content">
             <!-- Flash Messages -->
             <?php if (isset($_SESSION['success'])): ?>
@@ -70,7 +72,7 @@ function formatTime($time) {
                 </div>
                 <?php unset($_SESSION['success']); ?>
             <?php endif; ?>
-            
+
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="admin-flash-message admin-flash-error">
                     <i class="fas fa-exclamation-circle"></i>
@@ -78,7 +80,7 @@ function formatTime($time) {
                 </div>
                 <?php unset($_SESSION['error']); ?>
             <?php endif; ?>
-            
+
             <!-- Header Actions -->
             <div class="admin-section-header">
                 <h2 class="admin-section-title">Daftar Lahan Parkir</h2>
@@ -88,7 +90,7 @@ function formatTime($time) {
                     </a>
                 </div>
             </div>
-            
+
             <!-- Parking List -->
             <div class="admin-table-container">
                 <table class="admin-table">
@@ -146,12 +148,12 @@ function formatTime($time) {
                                     </td>
                                     <td>
                                         <div class="admin-actions-group">
-                                            <a href="<?= BASEURL ?>/admin/parking-detail.php?id=<?= $parking['id_tempat'] ?>" 
-                                               class="admin-btn admin-btn-sm admin-btn-secondary" title="Lihat Detail">
+                                            <a href="<?= BASEURL ?>/admin/parking-detail.php?id=<?= $parking['id_tempat'] ?>"
+                                                class="admin-btn admin-btn-sm admin-btn-secondary" title="Lihat Detail">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <form method="POST" style="display: inline;" 
-                                                  onsubmit="return confirm('Yakin ingin menghapus lahan parkir ini?');">
+                                            <form method="POST" style="display: inline;"
+                                                onsubmit="return confirm('Yakin ingin menghapus lahan parkir ini?');">
                                                 <input type="hidden" name="action" value="delete">
                                                 <input type="hidden" name="id_tempat" value="<?= $parking['id_tempat'] ?>">
                                                 <button type="submit" class="admin-btn admin-btn-sm admin-btn-danger" title="Hapus">
@@ -168,4 +170,3 @@ function formatTime($time) {
 </div>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
-
