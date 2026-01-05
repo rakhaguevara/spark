@@ -1,6 +1,7 @@
 # Environment & Config
 .env
 .env.local
+.env.production  # Production environment (contains secrets)
 config/database.local.php
 
 # Uploads & User Generated Content
@@ -8,6 +9,8 @@ uploads/profile/*
 !uploads/profile/.gitkeep
 uploads/tickets/*
 !uploads/tickets/.gitkeep
+uploads/parking_photos/*
+!uploads/parking_photos/.gitkeep
 
 # IDE & Editor
 .vscode/
@@ -21,6 +24,7 @@ Thumbs.db
 *.log
 error_log
 php_errors.log
+/var/log/
 
 # Temporary files
 tmp/
@@ -43,6 +47,10 @@ yarn.lock
 *.sql.gz
 *.sql.bak
 backup/
+backups/
+
+# Docker volumes (local development)
+db_data/
 
 # OS files
 .DS_Store
