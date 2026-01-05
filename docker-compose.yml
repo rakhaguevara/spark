@@ -28,8 +28,9 @@ services:
       - MYSQL_DATABASE=spark
     volumes:
       - db_data:/var/lib/mysql
-      # Auto-import spark (2).sql on first run
-      - ./spark (2).sql:/docker-entrypoint-initdb.d/init.sql
+      # Auto-import all SQL files on first run (alphabetically)
+      - ./database/00-init-complete.sql:/docker-entrypoint-initdb.d/00-init-complete.sql
+      - ./database/dummy_data.sql:/docker-entrypoint-initdb.d/01-dummy-data.sql
     ports:
       - "3308:3306"
 

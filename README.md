@@ -13,7 +13,7 @@ Modern web-based parking management system with real-time booking, QR code ticke
 git clone <repo-url> spark
 cd spark
 
-# Start all services
+# Start all services (auto-initialize database!)
 docker-compose up -d
 
 # Wait 30 seconds for database initialization
@@ -26,13 +26,29 @@ docker-compose up -d
 - 📊 PhpMyAdmin: http://localhost:8081
 
 **Credentials:**
-- Email: `admin@spark.local`
-- Password: Check `database/000-complete-setup.sql`
+- Admin Email: `admin@spark.com`
+- Admin Password: `admin123`
+
+**✨ What's Auto-Setup:**
+- ✅ All 18 database tables (including `owner_parkir`)
+- ✅ 3 Roles (user, admin, owner)
+- ✅ Default admin account
+- ✅ 10 Sample parking locations
+- ✅ Vehicle types & pricing
 
 **Stop services:**
 ```bash
 docker-compose down
 ```
+
+**Reset database (fresh start):**
+```bash
+docker-compose down
+docker volume rm spark_db_data
+docker-compose up -d
+```
+
+📖 **Detailed Guide:** See [DOCKER_SETUP_GUIDE.md](DOCKER_SETUP_GUIDE.md)
 
 ---
 

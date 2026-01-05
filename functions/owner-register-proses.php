@@ -89,7 +89,16 @@ try {
     exit;
 } catch (PDOException $e) {
     error_log('OWNER REGISTER ERROR: ' . $e->getMessage());
-    $_SESSION['error'] = 'Terjadi kesalahan sistem. Silakan coba lagi.';
+    error_log('OWNER REGISTER ERROR TRACE: ' . $e->getTraceAsString());
+    
+    // Show detailed error in development
+    $errorMsg = 'Terjadi kesalahan sistem: ' . $e->getMessage();
+    $_SESSION['error'] = $errorMsg;
+    header('Location: ' . BASEURL . '/owner/register.php');
+    exit;
+} catch (Exception $e) {
+    error_log('OWNER REGISTER GENERAL ERROR: ' . $e->getMessage());
+    $_SESSION['error'] = 'Terjadi kesalahan: ' . $e->getMessage();
     header('Location: ' . BASEURL . '/owner/register.php');
     exit;
 }
