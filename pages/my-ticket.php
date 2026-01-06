@@ -458,13 +458,26 @@ foreach ($bookings as $booking) {
         const REFRESH_INTERVAL = 10000; // 10 seconds
         const HAS_QR_TOKEN = <?= !empty($activeBooking['qr_token']) ? 'true' : 'false' ?>;
         
+        // Debug logging
+        console.log('=== QR System Configuration ===');
+        console.log('BASEURL:', BASEURL);
+        console.log('BOOKING_ID:', BOOKING_ID);
+        console.log('HAS_QR_TOKEN:', HAS_QR_TOKEN);
+        console.log('REFRESH_INTERVAL:', REFRESH_INTERVAL);
+        console.log('==============================');
+        
         let countdown = 10;
         let refreshTimer = null;
         let countdownTimer = null;
         
         // Fix missing QR token
         function fixMissingQR() {
-            if (!BOOKING_ID) return;
+            if (!BOOKING_ID) {
+                console.error('fixMissingQR: No BOOKING_ID available');
+                return;
+            }
+            
+            console.log('fixMissingQR: Starting for booking ID:', BOOKING_ID);
             
             const btn = event?.target;
             if (btn) {
@@ -472,19 +485,32 @@ foreach ($bookings as $booking) {
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
             }
             
-            fetch(BASEURL + '/api/fix-missing-qr-tokens.php?booking_id=' + BOOKING_ID, {
+            const apiUrl = BASEURL + '/api/fix-missing-qr-tokens.php?booking_id=' + BOOKING_ID;
+            console.log('fixMissingQR: Calling API:', apiUrl);
+            
+            fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                }
+                },
+                credentials: 'same-origin' // Include cookies for session
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('fixMissingQR: Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('fixMissingQR: Response data:', data);
                 if (data.success) {
                     console.log('QR token fixed:', data.message);
+                    alert('QR Code generated successfully! Page will reload.');
                     // Reload page to show QR code
                     location.reload();
                 } else {
+                    console.error('fixMissingQR: API returned error:', data.error);
                     alert('Failed to generate QR code: ' + (data.error || 'Unknown error'));
                     if (btn) {
                         btn.disabled = false;
@@ -493,8 +519,8 @@ foreach ($bookings as $booking) {
                 }
             })
             .catch(error => {
-                console.error('Fix QR error:', error);
-                alert('Error generating QR code. Please try again.');
+                console.error('fixMissingQR: Fetch error:', error);
+                alert('Error generating QR code: ' + error.message + '\n\nPlease check browser console for details.');
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-qrcode"></i> Generate QR Code';
